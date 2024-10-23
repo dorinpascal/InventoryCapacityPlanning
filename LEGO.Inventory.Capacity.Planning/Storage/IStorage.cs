@@ -1,16 +1,12 @@
-﻿using LEGO.Inventory.Capacity.Planning.Domain;
-using LEGO.Inventory.Capacity.Planning.Domain.DistributionCenters;
-using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
+﻿using LEGO.Inventory.Capacity.Planning.Domain.DistributionCenters;
 using LEGO.Inventory.Capacity.Planning.Domain.Orders;
 
-namespace LEGO.Inventory.Capacity.Planning.Storage
+namespace LEGO.Inventory.Capacity.Planning.Storage;
+
+public interface IStorage
 {
-    public interface IStorage
-    {
-        List<LocalDistributionCenter> LocalDistributionCenters { get; }
-        RegionalDistributionCenter RegionalDistributionCenter { get; }
-        List<StockTransportOrder> StockTransportOrders { get; set; }
-        List<SalesOrder> SalesOrders { get; set; }
-        List<GoodsReceipt> GoodsReceipts { get; set; }
-    }
+    Task<List<SalesOrder>> GetSalesOrdersAsync();
+    Task AddSalesOrderAsync(SalesOrder salesOrder);
+    Task<List<LocalDistributionCenter>> GetLocalDistributionCentersAsync();
+    Task<RegionalDistributionCenter> GetRegionalDistributionCenterAsync();
 }
