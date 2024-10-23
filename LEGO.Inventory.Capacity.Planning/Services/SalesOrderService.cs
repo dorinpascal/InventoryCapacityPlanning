@@ -13,8 +13,7 @@ public class SalesOrderService(IStorage _storage, ILogger<SalesOrderService> _lo
 
     public async Task Create(SalesOrder salesOrder)
     {
-        var localDistributionCenters = await _storage.GetLocalDistributionCentersAsync();
-        var localDistributionCenter = localDistributionCenters.Find(ldc => ldc.Name == salesOrder.LocalDistributionCenterName);
+        var localDistributionCenter = await _storage.GetLocalDistributionCentersByNameAsync(salesOrder.LocalDistributionCenterName);
         if (localDistributionCenter is null)
         {
             _logger.LogError("invalid local distribution center name");

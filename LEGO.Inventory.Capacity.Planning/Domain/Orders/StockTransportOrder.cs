@@ -31,4 +31,3 @@ public class StockTransportOrder
 
     public void UpdateStatus(StockTransportOrderStatus status) => Status = status;
 }
-

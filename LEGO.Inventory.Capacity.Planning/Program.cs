@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IGoodsReceiptService, GoodsReceiptService>();
 builder.Services.AddTransient<ISalesOrderService, SalesOrderService>();
 builder.Services.AddTransient<IStockTransportOrderService, StockTransportOrderService>();
-builder.Services.AddTransient<IPreparationService, PreparationService>();
+builder.Services.AddTransient<ISalesPreparationService, PreparationService>();
 builder.Services.AddTransient<IRegionalDistributionCenterService, RegionalDistributionCenterService>();
 builder.Services.AddSingleton<IStorage, Storage>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

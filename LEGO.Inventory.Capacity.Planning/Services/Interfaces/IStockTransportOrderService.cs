@@ -1,10 +1,9 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain;
 
-namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces
+namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces;
+
+public interface IStockTransportOrderService
 {
-    public interface IStockTransportOrderService
-    {
-        List<StockTransportOrder> GetStockTransportOrdersByLDC(string localDistributionCenterName);
-        void CreateStockTransportOrder(StockTransportOrder stockTransportOrder);
-    }
+    Task<List<StockTransportOrder>> GetByLDC(string localDistributionCenterName);
+    Task Create(StockTransportOrder stockTransportOrder);
 }

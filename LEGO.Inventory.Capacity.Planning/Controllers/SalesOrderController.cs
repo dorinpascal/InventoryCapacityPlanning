@@ -1,6 +1,6 @@
 using AutoMapper;
 using LEGO.Inventory.Capacity.Planning.Domain.Orders;
-using LEGO.Inventory.Capacity.Planning.Dtos;
+using LEGO.Inventory.Capacity.Planning.Dtos.SalesOrder;
 using LEGO.Inventory.Capacity.Planning.Helpers;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
 [ApiController]
 [Route("sales-order")]
-public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesOrderService _salesOrderService, IPreparationService _preparationService, IMapper _mapper) : ControllerBase
+public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesOrderService _salesOrderService, ISalesPreparationService _preparationService, IMapper _mapper) : ControllerBase
 {
     [HttpPost()]
     public async Task<IActionResult> Create([FromBody] SalesOrderRequestDto salesOrder)
@@ -18,7 +18,7 @@ public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesO
         {
             var newSalesOrder = _mapper.Map<SalesOrder>(salesOrder);
             await _salesOrderService.Create(newSalesOrder);
-            await _preparationService.PrepareSalesOrder(newSalesOrder);
+            await _preparationService.Prepare(newSalesOrder);
             _logger.LogInformation($"Sales order created successfully for {salesOrder.FinishedGoodsName}");
 
             return new CreatedResult();

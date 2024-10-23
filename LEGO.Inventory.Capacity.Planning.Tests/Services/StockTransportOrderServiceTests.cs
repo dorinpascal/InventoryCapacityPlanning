@@ -32,7 +32,7 @@ namespace LEGO.Inventory.Capacity.Planning.Tests.Services
             _storage.StockTransportOrders.AddRange(new[] { sto1, sto2, sto3 });
 
             // Act
-            var result = _stockTransportOrderService.GetStockTransportOrdersByLDC(ldcName);
+            var result = _stockTransportOrderService.GetByLDC(ldcName);
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -49,7 +49,7 @@ namespace LEGO.Inventory.Capacity.Planning.Tests.Services
             var sto = new StockTransportOrder("Lego - Star Wars", 10, "LEGO European Distribution Center", "Western Warehouse Europe");
 
             // Act
-            _stockTransportOrderService.CreateStockTransportOrder(sto);
+            _stockTransportOrderService.Create(sto);
 
             // Assert
             Assert.Single(_storage.StockTransportOrders);

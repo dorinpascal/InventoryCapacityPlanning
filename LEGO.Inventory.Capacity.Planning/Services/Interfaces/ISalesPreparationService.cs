@@ -2,7 +2,7 @@
 
 namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 
-public interface IPreparationService
+public interface ISalesPreparationService
 {
-    Task PrepareSalesOrder(SalesOrder salesOrder);
+    Task Prepare(SalesOrder salesOrder);
 }

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using LEGO.Inventory.Capacity.Planning.Domain.Orders;
-using LEGO.Inventory.Capacity.Planning.Dtos;
+using LEGO.Inventory.Capacity.Planning.Dtos.SalesOrder;
 
 namespace LEGO.Inventory.Capacity.Planning.Mapping;
 

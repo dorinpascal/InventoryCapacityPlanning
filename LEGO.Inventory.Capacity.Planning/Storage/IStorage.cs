@@ -8,5 +8,6 @@ public interface IStorage
     Task<List<SalesOrder>> GetSalesOrdersAsync();
     Task AddSalesOrderAsync(SalesOrder salesOrder);
     Task<List<LocalDistributionCenter>> GetLocalDistributionCentersAsync();
+    Task<LocalDistributionCenter?> GetLocalDistributionCentersByNameAsync(string name);
     Task<RegionalDistributionCenter> GetRegionalDistributionCenterAsync();
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LEGO.Inventory.Capacity.Planning.Dtos;
+namespace LEGO.Inventory.Capacity.Planning.Dtos.SalesOrder;
 
 public class SalesOrderRequestDto
 {
@@ -11,5 +11,5 @@ public class SalesOrderRequestDto
     public int Quantity { get; }
 
     [Required(ErrorMessage = "Local Distribution Center Name is required")]
-    public string LocalDistributionCenterName{ get;} = string.Empty;
+    public string LocalDistributionCenterName { get; } = string.Empty;
 }

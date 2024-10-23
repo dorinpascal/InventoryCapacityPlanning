@@ -2,25 +2,18 @@
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage;
 
-namespace LEGO.Inventory.Capacity.Planning.Services
+namespace LEGO.Inventory.Capacity.Planning.Services;
+
+public class StockTransportOrderService(IStockTransportOrderStorage _storage) : IStockTransportOrderService
 {
-    public class StockTransportOrderService : IStockTransportOrderService
+    public async Task<List<StockTransportOrder>> GetByLDC(string localDistributionCenterName)
     {
-        private readonly IStorage _storage;
+        var stockTransportOrder = await _storage.GetAllAsync();
+        return stockTransportOrder.Where(sto => sto.LocalDistributionCenterName == localDistributionCenterName).ToList();
+    }
 
-        public StockTransportOrderService(IStorage storage)
-        {
-            _storage = storage;
-        }
-
-        List<StockTransportOrder> IStockTransportOrderService.GetStockTransportOrdersByLDC(string localDistributionCenterName)
-        {
-            return _storage.StockTransportOrders.Where(sto => sto.LocalDistributionCenterName == localDistributionCenterName).ToList();
-        }
-
-        public void CreateStockTransportOrder(StockTransportOrder stockTransportOrder)
-        {
-            _storage.StockTransportOrders.Add(stockTransportOrder);
-        }
+    public async Task Create(StockTransportOrder stockTransportOrder)
+    {
+        await _storage.AddAsync(stockTransportOrder);
     }
 }

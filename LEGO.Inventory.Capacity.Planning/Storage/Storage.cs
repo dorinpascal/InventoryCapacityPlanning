@@ -6,6 +6,7 @@ namespace LEGO.Inventory.Capacity.Planning.Storage;
 public class Storage : IStorage
 {
     private readonly List<SalesOrder> _salesOrders = [];
+
     private readonly List<LocalDistributionCenter> _localDistributionCenters =
     [
         new LocalDistributionCenter("Central Warehouse Europe", "LEGO European Distribution Center", "Lego - Harry Potter", 50, 20, 20),
@@ -35,5 +36,11 @@ public class Storage : IStorage
     public Task<RegionalDistributionCenter> GetRegionalDistributionCenterAsync()
     {
         return Task.FromResult(_regionalDistributionCenter);
+    }
+
+    public Task<LocalDistributionCenter?> GetLocalDistributionCentersByNameAsync(string name)
+    {
+        var ldc = _localDistributionCenters.Find(x => x.Name == name);
+        return Task.FromResult(ldc);
     }
 }
