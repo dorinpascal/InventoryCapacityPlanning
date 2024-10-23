@@ -1,10 +1,9 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
 
-namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces
+namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces;
+
+public interface IGoodsReceiptService
 {
-    public interface IGoodsReceiptService
-    {
-        void CreateGoodsReceipt(GoodsReceipt goodsReceipt);
-        List<GoodsReceipt> GetGoodsReceiptList();
-    }
+    Task Create(GoodsReceipt goodsReceipt);
+    Task<List<GoodsReceipt>> GetAll();
 }

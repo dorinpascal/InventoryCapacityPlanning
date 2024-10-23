@@ -20,6 +20,7 @@ builder.Services.AddScoped<IRegionalDistributionCenterStorage, RegionalDistribut
 builder.Services.AddScoped<ILocalDistributionCenterStorage, LocalDistributionCenterStorage>();
 builder.Services.AddScoped<ISalesOrderStorage, SalesOrderStorage>();
 builder.Services.AddScoped<IStockTransportOrderStorage, StockTransportOrderStorage>();
+builder.Services.AddScoped<IGoodsReceiptStorage, GoodsReceiptStorage>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.WebHost.UseUrls("http://*:5100");

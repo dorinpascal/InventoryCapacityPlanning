@@ -2,10 +2,7 @@
 
 public class GoodsReceipt
 {
-    public GoodsReceipt(Guid stockTransportOrderId)
-    {
-        StockTransportOrderId = stockTransportOrderId;
-    }
-
     public Guid StockTransportOrderId { get; }
+
+    public GoodsReceipt(Guid stockTransportOrderId) => StockTransportOrderId = stockTransportOrderId;
 }

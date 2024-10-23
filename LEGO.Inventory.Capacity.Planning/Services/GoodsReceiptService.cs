@@ -3,42 +3,28 @@ using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
-namespace LEGO.Inventory.Capacity.Planning.Services
+namespace LEGO.Inventory.Capacity.Planning.Services;
+
+public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, IStockTransportOrderStorage _transportOrderStorage, ILocalDistributionCenterStorage _distributionCenterStorage, ILogger<GoodsReceipt> logger) : IGoodsReceiptService
 {
-    public class GoodsReceiptService : IGoodsReceiptService
+    public Task<List<GoodsReceipt>> GetAll()
     {
-        private readonly IRegionalDistributionCenterStorage _storage;
-        private readonly ILogger<GoodsReceipt> _logger;
+        return _goodsReceiptStorage.GetAllAsync();
+    }
 
+    public async Task Create(GoodsReceipt goodsReceipt)
+    {
+        await _goodsReceiptStorage.AddAsync(goodsReceipt);
+        var stockTransportOrders = await _transportOrderStorage.GetAllAsync();
+        var stockTransportOrder = stockTransportOrders.Find(sto => sto.Id == goodsReceipt.StockTransportOrderId) ??
+            throw new ArgumentException("Missing stock transport order");
 
-        public GoodsReceiptService(IRegionalDistributionCenterStorage storage, ILogger<GoodsReceipt> logger)
+        if (stockTransportOrder.Status == StockTransportOrderStatus.Picked)
         {
-            _storage = storage;
-            _logger = logger;
-        }
-
-        public List<GoodsReceipt> GetGoodsReceiptList()
-        {
-            return _storage.GoodsReceipts;
-        }
-
-        void IGoodsReceiptService.CreateGoodsReceipt(GoodsReceipt goodsReceipt)
-        {
-            _storage.GoodsReceipts.Add(goodsReceipt);
-
-            var stockTransportOrder =
-                _storage.StockTransportOrders.FirstOrDefault(sto => sto.Id == goodsReceipt.StockTransportOrderId) ??
-                throw new Exception("Missing stock transport order");
-
-            if (stockTransportOrder.Status == StockTransportOrderStatus.Picked)
-            {
-                var localDistributionCenter =
-                    _storage.LocalDistributionCenters.First(x =>
-                        x.Name == stockTransportOrder.LocalDistributionCenterName);
-                localDistributionCenter.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold;
-                _logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " +
-                                       localDistributionCenter.SafetyStockQuantity);
-            }
+            var localDistributionCenter = await  _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName);
+            localDistributionCenter!.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold;
+            logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " +
+                                   localDistributionCenter.SafetyStockQuantity);
         }
     }
 }
