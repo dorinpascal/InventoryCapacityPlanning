@@ -16,6 +16,8 @@ builder.Services.AddTransient<IStockTransportOrderService, StockTransportOrderSe
 builder.Services.AddTransient<IPreparationService, PreparationService>();
 builder.Services.AddTransient<IRegionalDistributionCenterService, RegionalDistributionCenterService>();
 builder.Services.AddSingleton<IStorage, Storage>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.WebHost.UseUrls("http://*:5100");
 
 var app = builder.Build();
