@@ -1,17 +1,17 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain;
 using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 namespace LEGO.Inventory.Capacity.Planning.Services
 {
     public class GoodsReceiptService : IGoodsReceiptService
     {
-        private readonly IStorage _storage;
+        private readonly IRegionalDistributionCenterStorage _storage;
         private readonly ILogger<GoodsReceipt> _logger;
 
 
-        public GoodsReceiptService(IStorage storage, ILogger<GoodsReceipt> logger)
+        public GoodsReceiptService(IRegionalDistributionCenterStorage storage, ILogger<GoodsReceipt> logger)
         {
             _storage = storage;
             _logger = logger;

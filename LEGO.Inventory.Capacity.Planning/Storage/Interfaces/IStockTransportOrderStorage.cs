@@ -1,6 +1,6 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain;
 
-namespace LEGO.Inventory.Capacity.Planning.Storage;
+namespace LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 public interface IStockTransportOrderStorage
 {

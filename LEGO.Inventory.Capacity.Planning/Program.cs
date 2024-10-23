@@ -1,6 +1,7 @@
 using LEGO.Inventory.Capacity.Planning.Services;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +16,10 @@ builder.Services.AddTransient<ISalesOrderService, SalesOrderService>();
 builder.Services.AddTransient<IStockTransportOrderService, StockTransportOrderService>();
 builder.Services.AddTransient<ISalesPreparationService, PreparationService>();
 builder.Services.AddTransient<IRegionalDistributionCenterService, RegionalDistributionCenterService>();
-builder.Services.AddSingleton<IStorage, Storage>();
+builder.Services.AddScoped<IRegionalDistributionCenterStorage, RegionalDistributionCenterStorage>();
+builder.Services.AddScoped<ILocalDistributionCenterStorage, LocalDistributionCenterStorage>();
+builder.Services.AddScoped<ISalesOrderStorage, SalesOrderStorage>();
+builder.Services.AddScoped<IStockTransportOrderStorage, StockTransportOrderStorage>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.WebHost.UseUrls("http://*:5100");

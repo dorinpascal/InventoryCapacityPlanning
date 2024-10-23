@@ -4,18 +4,18 @@ using LEGO.Inventory.Capacity.Planning.Domain;
 using LEGO.Inventory.Capacity.Planning.Domain.DistributionCenters;
 using LEGO.Inventory.Capacity.Planning.Services;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 using Xunit;
 
 namespace LEGO.Inventory.Capacity.Planning.Tests.Services
 {
     public class StockTransportOrderServiceTests
     {
-        private readonly IStorage _storage;
+        private readonly IRegionalDistributionCenterStorage _storage;
         private readonly IStockTransportOrderService _stockTransportOrderService;
         public StockTransportOrderServiceTests() 
         {
-            _storage = new Storage.Storage();
+            _storage = new Storage.RegionalDistributionCenterStorage();
             _stockTransportOrderService = new StockTransportOrderService(_storage);
 
         }

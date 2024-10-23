@@ -15,7 +15,7 @@ public class PreparationServiceTests
     {
         // Arrange
         var mockStockTransportOrderService = new Mock<IStockTransportOrderService>();
-        var storage = new Storage();
+        var storage = new RegionalDistributionCenterStorage();
         var mockLogger = new Mock<ILogger<PreparationService>>();
 
         var service = new PreparationService(mockStockTransportOrderService.Object, storage, mockLogger.Object);
@@ -35,7 +35,7 @@ public class PreparationServiceTests
     {
         // Arrange
         var mockStockTransportOrderService = new Mock<IStockTransportOrderService>();
-        var storage = new Storage();
+        var storage = new RegionalDistributionCenterStorage();
         var mockLogger = new Mock<ILogger<PreparationService>>();
 
         var service = new PreparationService(mockStockTransportOrderService.Object, storage, mockLogger.Object);

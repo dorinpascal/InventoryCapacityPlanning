@@ -1,15 +1,15 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 namespace LEGO.Inventory.Capacity.Planning.Services
 {
     public class RegionalDistributionCenterService : IRegionalDistributionCenterService
     {
-        private readonly IStorage _storage;
+        private readonly IRegionalDistributionCenterStorage _storage;
         private readonly ILogger<RegionalDistributionCenterService> _logger;
 
-        public RegionalDistributionCenterService(IStorage storage, ILogger<RegionalDistributionCenterService> logger)
+        public RegionalDistributionCenterService(IRegionalDistributionCenterStorage storage, ILogger<RegionalDistributionCenterService> logger)
         {
             _storage = storage;
             _logger = logger;

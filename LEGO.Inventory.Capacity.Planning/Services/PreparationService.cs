@@ -2,11 +2,11 @@
 using LEGO.Inventory.Capacity.Planning.Domain.DistributionCenters;
 using LEGO.Inventory.Capacity.Planning.Domain.Orders;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 namespace LEGO.Inventory.Capacity.Planning.Services;
 
-public class PreparationService(IStockTransportOrderService _stockTransportOrderService, IStorage _storage,
+public class PreparationService(IStockTransportOrderService _stockTransportOrderService, IRegionalDistributionCenterStorage _storage,
     ILogger<PreparationService> _logger) : ISalesPreparationService
 {
     public async Task Prepare(SalesOrder salesOrder)

@@ -1,7 +1,7 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain.DistributionCenters;
 using LEGO.Inventory.Capacity.Planning.Domain.Orders;
 using LEGO.Inventory.Capacity.Planning.Services;
-using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -13,7 +13,7 @@ public class SalesOrderServiceTests
     public void create_sales_order_with_valid_ldc_name()
     {
         // Arrange
-        var mockStorage = new Mock<IStorage>();
+        var mockStorage = new Mock<IRegionalDistributionCenterStorage>();
         var mockLogger = new Mock<ILogger<SalesOrderService>>();
         var salesOrder = new SalesOrder("Lego - Harry Potter", 10, "Western Warehouse Europe");
 
@@ -39,7 +39,7 @@ public class SalesOrderServiceTests
     public void create_sales_order_with_invalid_ldc_name()
     {
         // Arrange
-        var mockStorage = new Mock<IStorage>();
+        var mockStorage = new Mock<IRegionalDistributionCenterStorage>();
         var mockLogger = new Mock<ILogger<SalesOrderService>>();
         var salesOrder = new SalesOrder("Lego - Harry Potter", 10, "Western Warehouse Europe");
 

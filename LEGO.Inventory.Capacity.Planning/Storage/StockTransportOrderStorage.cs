@@ -1,4 +1,5 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 namespace LEGO.Inventory.Capacity.Planning.Storage;
 
