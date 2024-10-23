@@ -26,10 +26,10 @@ public class PreparationService : IPreparationService
             _storage.LocalDistributionCenters.FirstOrDefault(ldc => ldc.Name == salesOrder.LocalDistributionCenterName);
         var requiredQuantity = 0;
 
-        if(_localDistributionCenter.FinishedGoodsStockQuantity >= salesOrder.Quantity)
+        if (_localDistributionCenter.FinishedGoodsStockQuantity >= salesOrder.Quantity)
         {
             _localDistributionCenter.FinishedGoodsStockQuantity = _localDistributionCenter.FinishedGoodsStockQuantity - salesOrder.Quantity;
-            _logger.LogInformation(_localDistributionCenter.Name+"'s new stock quantity: " + _localDistributionCenter.FinishedGoodsStockQuantity);
+            _logger.LogInformation(_localDistributionCenter.Name + "'s new stock quantity: " + _localDistributionCenter.FinishedGoodsStockQuantity);
             return;
         }
         else if (_localDistributionCenter.FinishedGoodsStockQuantity < salesOrder.Quantity)
@@ -87,7 +87,7 @@ public class PreparationService : IPreparationService
             requiredQuantity,
             _storage.RegionalDistributionCenter.Name,
             _localDistributionCenter.Name));
-        
+
         _logger.LogInformation($"new STO created: " + salesOrder.FinishedGoodsName + "Quantity: " + requiredQuantity
                                + ", from : " + _storage.RegionalDistributionCenter.Name + " to " +
                                _localDistributionCenter.Name);

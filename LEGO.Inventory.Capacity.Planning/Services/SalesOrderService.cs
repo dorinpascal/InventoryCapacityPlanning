@@ -4,11 +4,11 @@ using LEGO.Inventory.Capacity.Planning.Storage;
 
 namespace LEGO.Inventory.Capacity.Planning.Services
 {
-    public class SalesOrderService: ISalesOrderService
+    public class SalesOrderService : ISalesOrderService
     {
         private readonly IStorage _storage;
         private readonly ILogger<SalesOrderService> _logger;
-        
+
         public SalesOrderService(IStorage storage, ILogger<SalesOrderService> logger)
         {
             _storage = storage;

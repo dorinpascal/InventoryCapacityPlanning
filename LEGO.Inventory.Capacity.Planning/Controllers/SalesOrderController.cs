@@ -7,7 +7,7 @@ namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
 [ApiController]
 [Route("sales-order")]
-public class SalesOrderController(ILogger<SalesOrderController> _logger ,ISalesOrderService _salesOrderService, IPreparationService _preparationService) : ControllerBase
+public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesOrderService _salesOrderService, IPreparationService _preparationService) : ControllerBase
 {
     [HttpPost()]
     public IActionResult Create([FromBody] SalesOrder salesOrder)
@@ -16,7 +16,7 @@ public class SalesOrderController(ILogger<SalesOrderController> _logger ,ISalesO
         {
             _salesOrderService.CreateSalesOrder(salesOrder);
             _preparationService.PrepareSalesOrder(salesOrder);
-            
+
             return new CreatedResult();
         }
         catch (Exception ex)
