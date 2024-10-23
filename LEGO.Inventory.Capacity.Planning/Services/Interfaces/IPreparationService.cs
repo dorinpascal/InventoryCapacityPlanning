@@ -1,9 +1,8 @@
 ﻿using LEGO.Inventory.Capacity.Planning.Domain.Orders;
 
-namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces
+namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces;
+
+public interface IPreparationService
 {
-    public interface IPreparationService
-    {
-        void PrepareSalesOrder(SalesOrder salesOrder);
-    }
+    Task PrepareSalesOrder(SalesOrder salesOrder);
 }

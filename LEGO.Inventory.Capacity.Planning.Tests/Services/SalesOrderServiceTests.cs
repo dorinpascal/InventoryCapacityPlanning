@@ -28,7 +28,7 @@ public class SalesOrderServiceTests
         var sut = new SalesOrderService(mockStorage.Object, mockLogger.Object);
 
         // Act
-        sut.CreateSalesOrder(salesOrder);
+        sut.Create(salesOrder);
 
         // Assert
         Assert.Single(mockStorage.Object.SalesOrders);
@@ -54,7 +54,7 @@ public class SalesOrderServiceTests
         var sut = new SalesOrderService(mockStorage.Object, mockLogger.Object);
 
         // Assert
-        var ex = Assert.Throws<Exception>(() => sut.CreateSalesOrder(salesOrder));
+        var ex = Assert.Throws<Exception>(() => sut.Create(salesOrder));
         Assert.Equal("invalid local distribution center name", ex.Message);
     }
 }
