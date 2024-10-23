@@ -1,4 +1,5 @@
 using LEGO.Inventory.Capacity.Planning.Domain.Orders;
+using LEGO.Inventory.Capacity.Planning.Helpers;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,16 +7,8 @@ namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
 [ApiController]
 [Route("sales-order")]
-public class SalesOrderController : ControllerBase
+public class SalesOrderController(ILogger<SalesOrderController> _logger ,ISalesOrderService _salesOrderService, IPreparationService _preparationService) : ControllerBase
 {
-    private readonly ISalesOrderService _salesOrderService;
-    private readonly IPreparationService _preparationService;
-    public SalesOrderController(ISalesOrderService salesOrderService, IPreparationService preparationService)
-    {
-        _salesOrderService = salesOrderService;
-        _preparationService = preparationService;
-    }
-
     [HttpPost()]
     public IActionResult Create([FromBody] SalesOrder salesOrder)
     {
@@ -24,13 +17,13 @@ public class SalesOrderController : ControllerBase
             _salesOrderService.CreateSalesOrder(salesOrder);
             _preparationService.PrepareSalesOrder(salesOrder);
             
-            return Ok("created");
+            return new CreatedResult();
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return ControllerResponseMessageHelper.HandleException(ex, _logger);
         }
-        
+
     }
     [HttpGet()]
     public IActionResult GetAll()
@@ -41,7 +34,7 @@ public class SalesOrderController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return ControllerResponseMessageHelper.HandleException(ex, _logger);
         }
     }
 }
