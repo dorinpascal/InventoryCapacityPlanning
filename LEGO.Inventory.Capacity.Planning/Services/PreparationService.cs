@@ -6,79 +6,77 @@ using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 namespace LEGO.Inventory.Capacity.Planning.Services;
 
-public class PreparationService(IStockTransportOrderService _stockTransportOrderService, IRegionalDistributionCenterStorage _storage,
+public class PreparationService(IStockTransportOrderService _stockTransportOrderService, ILocalDistributionCenterStorage _localDistributionCenterStorage, IRegionalDistributionCenterStorage _regionalDistributionCenterStorage,
     ILogger<PreparationService> _logger) : ISalesPreparationService
 {
     public async Task Prepare(SalesOrder salesOrder)
     {
-        var localDistributionCenter = await _storage.GetLocalDistributionCentersByNameAsync(salesOrder.LocalDistributionCenterName);
-
-        var requiredQuantity = 0;
-
-        if (localDistributionCenter.FinishedGoodsStockQuantity >= salesOrder.Quantity)
+        var localDistributionCenter = await _localDistributionCenterStorage.GetByNameAsync(salesOrder.LocalDistributionCenterName);
+        if (localDistributionCenter == null)
         {
-            localDistributionCenter.FinishedGoodsStockQuantity = localDistributionCenter.FinishedGoodsStockQuantity - salesOrder.Quantity;
-            _logger.LogInformation(localDistributionCenter.Name + "'s new stock quantity: " + localDistributionCenter.FinishedGoodsStockQuantity);
-            return;
-        }
-        else if (localDistributionCenter.FinishedGoodsStockQuantity < salesOrder.Quantity)
-        {
-            var shortfall = salesOrder.Quantity - localDistributionCenter.FinishedGoodsStockQuantity;
-            localDistributionCenter.FinishedGoodsStockQuantity = 0;
-
-            if (localDistributionCenter.SafetyStockQuantity >= shortfall)
-            {
-                localDistributionCenter.SafetyStockQuantity -= shortfall;
-                requiredQuantity = shortfall;
-            }
-            else
-            {
-                requiredQuantity = localDistributionCenter.SafetyStockThreshold;
-                localDistributionCenter.SafetyStockQuantity = 0;
-            }
-
-            if (localDistributionCenter.SafetyStockQuantity == 0)
-            {
-                CreateSto(salesOrder, localDistributionCenter, requiredQuantity);
-            }
-            else if (localDistributionCenter.SafetyStockQuantity < localDistributionCenter.SafetyStockThreshold)
-            {
-                CreateSto(salesOrder, localDistributionCenter, (localDistributionCenter.SafetyStockThreshold - localDistributionCenter.SafetyStockQuantity));
-            }
-
-            _logger.LogWarning(localDistributionCenter.Name + "'s new safety stock quantity: " + localDistributionCenter.SafetyStockQuantity);
+            _logger.LogWarning($"Local distribution center '{salesOrder.LocalDistributionCenterName}' not found.");
             return;
         }
 
-        else if (salesOrder.Quantity > localDistributionCenter.FinishedGoodsStockQuantity
-        && salesOrder.Quantity <= localDistributionCenter.FinishedGoodsStockQuantity + localDistributionCenter.SafetyStockQuantity)
+        var requiredQuantity = HandleStockReductionAsync(localDistributionCenter, salesOrder.Quantity);
 
+        if (requiredQuantity > 0)
         {
-            int requiredFromSafetyStock = salesOrder.Quantity - localDistributionCenter.FinishedGoodsStockQuantity;
-            localDistributionCenter.FinishedGoodsStockQuantity = 0;
-            localDistributionCenter.SafetyStockQuantity = localDistributionCenter.SafetyStockQuantity - requiredFromSafetyStock;
-
-            if (localDistributionCenter.SafetyStockQuantity == 0
-                || localDistributionCenter.SafetyStockQuantity < localDistributionCenter.SafetyStockThreshold)
-            {
-                CreateSto(salesOrder, localDistributionCenter, requiredFromSafetyStock);
-            }
-            _logger.LogInformation(localDistributionCenter.Name + "'s new stock quantity: " + localDistributionCenter.FinishedGoodsStockQuantity);
-            _logger.LogWarning(localDistributionCenter.Name + "'s new safety stock quantity: " + localDistributionCenter.SafetyStockQuantity);
+            await CreateStoAsync(salesOrder, localDistributionCenter, requiredQuantity);
         }
+
+        LogStockQuantities(localDistributionCenter);
     }
 
-    private void CreateSto(SalesOrder salesOrder, LocalDistributionCenter _localDistributionCenter,
-        int requiredQuantity)
+    private static int HandleStockReductionAsync(LocalDistributionCenter localDistributionCenter, int orderedQuantity)
     {
-        _stockTransportOrderService.Create(new StockTransportOrder(
+        var requiredQuantity = 0;
+
+        if (localDistributionCenter.FinishedGoodsStockQuantity >= orderedQuantity)
+        {
+            localDistributionCenter.FinishedGoodsStockQuantity -= orderedQuantity;
+            return requiredQuantity; // No additional stock required from STO
+        }
+
+        requiredQuantity = orderedQuantity - localDistributionCenter.FinishedGoodsStockQuantity;
+        localDistributionCenter.FinishedGoodsStockQuantity = 0;
+
+        if (localDistributionCenter.SafetyStockQuantity >= requiredQuantity)
+        {
+            localDistributionCenter.SafetyStockQuantity -= requiredQuantity;
+        }
+        else
+        {
+            requiredQuantity = localDistributionCenter.SafetyStockThreshold;
+            localDistributionCenter.SafetyStockQuantity = 0;
+        }
+
+        return requiredQuantity;
+    }
+
+    private async Task CreateStoAsync(SalesOrder salesOrder, LocalDistributionCenter localDistributionCenter, int requiredQuantity)
+    {
+        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAllAsync();
+
+        var stockTransportOrder = new StockTransportOrder(
             salesOrder.FinishedGoodsName,
             requiredQuantity,
-            _storage.RegionalDistributionCenter.Name,
-            _localDistributionCenter.Name));
+            regionalDistributionCenter.Name,
+            localDistributionCenter.Name
+        );
 
-        _logger.LogInformation($"new STO created: " + salesOrder.FinishedGoodsName + "Quantity: " + requiredQuantity
-                               + ", from : " + _storage.RegionalDistributionCenter.Name + " to " +
-                               _localDistributionCenter.Name);
+        await _stockTransportOrderService.Create(stockTransportOrder);
+
+        _logger.LogInformation("New STO created for product {Product}, Quantity: {Quantity}, from: {RDC} to {LDC}",
+            salesOrder.FinishedGoodsName, requiredQuantity, regionalDistributionCenter.Name, localDistributionCenter.Name);
+    }
+
+    private void LogStockQuantities(LocalDistributionCenter localDistributionCenter)
+    {
+        _logger.LogInformation("{LDC}'s updated stock quantity: {StockQuantity}",
+            localDistributionCenter.Name, localDistributionCenter.FinishedGoodsStockQuantity);
+
+        _logger.LogWarning("{LDC}'s updated safety stock quantity: {SafetyStockQuantity}",
+            localDistributionCenter.Name, localDistributionCenter.SafetyStockQuantity);
     }
 }
