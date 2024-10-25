@@ -13,16 +13,10 @@ public class SalesOrderService(ISalesOrderStorage _salesOrderStorage, ILocalDist
 
     public async Task Create(SalesOrder salesOrder)
     {
-        var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(salesOrder.LocalDistributionCenterName);
-        if (localDistributionCenter is null)
-        {
-            _logger.LogError("invalid local distribution center name");
-            throw new ArgumentException("invalid local distribution center name");
-        }
-        else
-        {
-            await _salesOrderStorage.AddAsync(salesOrder);
-            _logger.LogInformation($"new order created: " + salesOrder.FinishedGoodsName + " : " + salesOrder.Quantity + " -LDC: " + salesOrder.LocalDistributionCenterName);
-        }
+        _ = await _distributionCenterStorage.GetByNameAsync(salesOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");
+
+        await _salesOrderStorage.AddAsync(salesOrder);
+        _logger.LogInformation($"new order created: " + salesOrder.FinishedGoodsName + " : " + salesOrder.Quantity + " -LDC: " + salesOrder.LocalDistributionCenterName);
+        
     }
 }

@@ -5,7 +5,7 @@ namespace LEGO.Inventory.Capacity.Planning.Storage;
 
 public class SalesOrderStorage : ISalesOrderStorage
 {
-    private readonly List<SalesOrder> _salesOrders = [];
+    private static readonly List<SalesOrder> _salesOrders = [];
 
     public Task AddAsync(SalesOrder salesOrder)
     {

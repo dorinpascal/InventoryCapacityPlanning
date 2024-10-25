@@ -5,9 +5,11 @@ using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
+[ApiController]
+[Route("goods-receipt")]
 public class GoodsReceiptController(ILogger<GoodsReceiptController> _logger, IGoodsReceiptService _goodsReceiptService, IMapper _mapper) : Controller
 {
-    [HttpGet("getAll")]
+    [HttpGet()]
     public async Task<IActionResult> GetAll()
     {
         try

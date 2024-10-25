@@ -16,8 +16,8 @@ public static class ControllerResponseMessageHelper
                 (HttpStatusCode.BadRequest, argException.Message, null),
             InvalidOperationException invalidOperationException =>
                 (HttpStatusCode.BadRequest, invalidOperationException.Message, null),
-        _ =>
-                (HttpStatusCode.ServiceUnavailable, "Service Unavailable", new List<string> { exception.Message })
+            _ =>
+                    (HttpStatusCode.ServiceUnavailable, "Service Unavailable", new List<string> { exception.Message })
         };
 
         logger.Log(statusCode == HttpStatusCode.ServiceUnavailable ? LogLevel.Error : LogLevel.Information, message);

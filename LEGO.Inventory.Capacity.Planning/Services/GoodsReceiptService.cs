@@ -1,5 +1,5 @@
-﻿using LEGO.Inventory.Capacity.Planning.Domain;
-using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
+﻿using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
+using LEGO.Inventory.Capacity.Planning.Domain.Orders;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
@@ -21,7 +21,7 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
 
         if (stockTransportOrder.Status == StockTransportOrderStatus.Picked)
         {
-            var localDistributionCenter = await  _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName);
+            var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName);
             localDistributionCenter!.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold;
             logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " +
                                    localDistributionCenter.SafetyStockQuantity);

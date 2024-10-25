@@ -10,18 +10,34 @@ namespace LEGO.Inventory.Capacity.Planning.Controllers;
 [Route("stock-transport-orders")]
 public class StockTransportOrderController(ILogger<StockTransportOrderController> _logger, IStockTransportOrderService _stockTransportOrderService, IMapper _mapper) : ControllerBase
 {
-    [HttpGet("getAllByLDCName")]
-    public async Task<IActionResult> GetAll([FromQuery] string nameLDC)
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] string ldcName, [FromQuery] string? status = null)
     {
         try
         {
-            var stockTransportOrders = await _stockTransportOrderService.GetByLDC(nameLDC);
+            var stockTransportOrders = await _stockTransportOrderService.GetByLDC(ldcName, status);
             var dto = _mapper.Map<List<StockTransportOrderDto>>(stockTransportOrders);
-            return new OkObjectResult(dto);
+            return Ok(dto);
         }
         catch (Exception ex)
         {
             return ControllerResponseMessageHelper.HandleException(ex, _logger);
+        }
+    }
+
+    [HttpPost("pick")]
+    public async Task<IActionResult> PickStockTransportOrder([FromQuery] Guid id)
+    {
+        try
+        {
+            await _stockTransportOrderService.PickStockTransportOrder(id);
+            _logger.LogInformation($"STO with ID {id} picked successfully.");
+            return Ok("STO picked successfully.");
+        }
+        catch (Exception ex)
+        {
+            return ControllerResponseMessageHelper.HandleException(ex, _logger);
+
         }
     }
 }

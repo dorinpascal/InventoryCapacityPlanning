@@ -11,14 +11,9 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
 {
     public async Task Prepare(SalesOrder salesOrder)
     {
-        var localDistributionCenter = await _localDistributionCenterStorage.GetByNameAsync(salesOrder.LocalDistributionCenterName);
-        if (localDistributionCenter == null)
-        {
-            _logger.LogWarning($"Local distribution center '{salesOrder.LocalDistributionCenterName}' not found.");
-            return;
-        }
+        var localDistributionCenter = await _localDistributionCenterStorage.GetByNameAsync(salesOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");
 
-        var requiredQuantity = HandleStockReductionAsync(localDistributionCenter, salesOrder.Quantity);
+        var requiredQuantity = await HandleStockReductionAsync(localDistributionCenter, salesOrder.Quantity);
 
         if (requiredQuantity > 0)
         {
@@ -28,29 +23,32 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
         LogStockQuantities(localDistributionCenter);
     }
 
-    private static int HandleStockReductionAsync(LocalDistributionCenter localDistributionCenter, int orderedQuantity)
+    private async Task<int> HandleStockReductionAsync(LocalDistributionCenter localDistributionCenter, int orderedQuantity)
     {
         var requiredQuantity = 0;
-
+        // Case 1: LDC has enough finished goods to fulfill the order
         if (localDistributionCenter.FinishedGoodsStockQuantity >= orderedQuantity)
         {
             localDistributionCenter.FinishedGoodsStockQuantity -= orderedQuantity;
+            await _localDistributionCenterStorage.UpdateAsync(localDistributionCenter);
             return requiredQuantity; // No additional stock required from STO
         }
 
+        // Case 2: LDC does not have enough finished goods, calculate the required quantity
         requiredQuantity = orderedQuantity - localDistributionCenter.FinishedGoodsStockQuantity;
         localDistributionCenter.FinishedGoodsStockQuantity = 0;
 
+        // Try to cover the remaining quantity using Safety Stock
         if (localDistributionCenter.SafetyStockQuantity >= requiredQuantity)
         {
             localDistributionCenter.SafetyStockQuantity -= requiredQuantity;
         }
         else
         {
-            requiredQuantity = localDistributionCenter.SafetyStockThreshold;
+            requiredQuantity -= localDistributionCenter.SafetyStockQuantity;
             localDistributionCenter.SafetyStockQuantity = 0;
         }
-
+        await _localDistributionCenterStorage.UpdateAsync(localDistributionCenter);
         return requiredQuantity;
     }
 
@@ -58,12 +56,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
     {
         var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAllAsync();
 
-        var stockTransportOrder = new StockTransportOrder(
-            salesOrder.FinishedGoodsName,
-            requiredQuantity,
-            regionalDistributionCenter.Name,
-            localDistributionCenter.Name
-        );
+        var stockTransportOrder = new StockTransportOrder( salesOrder.FinishedGoodsName, requiredQuantity, regionalDistributionCenter.Name, localDistributionCenter.Name);
 
         await _stockTransportOrderService.Create(stockTransportOrder);
 
@@ -72,7 +65,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
     }
 
     private void LogStockQuantities(LocalDistributionCenter localDistributionCenter)
-    {
+    {   
         _logger.LogInformation("{LDC}'s updated stock quantity: {StockQuantity}",
             localDistributionCenter.Name, localDistributionCenter.FinishedGoodsStockQuantity);
 

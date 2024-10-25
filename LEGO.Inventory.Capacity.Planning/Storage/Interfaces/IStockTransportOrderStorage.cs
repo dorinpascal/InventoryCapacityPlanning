@@ -6,4 +6,6 @@ public interface IStockTransportOrderStorage
 {
     Task<List<StockTransportOrder>> GetAllAsync();
     Task AddAsync(StockTransportOrder stockTransportOrder);
+    Task<StockTransportOrder?> GetByIdAsync(Guid id);
+    Task UpdateAsync(StockTransportOrder sto);
 }

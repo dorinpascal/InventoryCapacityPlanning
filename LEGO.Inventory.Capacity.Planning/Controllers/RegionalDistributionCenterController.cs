@@ -5,15 +5,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
+[ApiController]
+[Route("stock-transport-order")]
 public class RegionalDistributionCenterController(ILogger<RegionalDistributionCenterController> _logger, IRegionalDistributionCenterService _regionalDistributionCenterService, IGoodsReceiptService _goodsReceiptService) : Controller
 {
-    [HttpPost("handleStockTransportOrder")]
+    [HttpPost()]
     public async Task<IActionResult> HandleStockTransportOrder([FromBody] Guid stockTransportOrderId)
     {
         try
         {
             var quantityLeft = await _regionalDistributionCenterService.TryPickSTOAsync(stockTransportOrderId);
-            if(quantityLeft == 0)
+            if (quantityLeft == 0)
             {
                 throw new ArgumentException("Insufficient stock");
             }
