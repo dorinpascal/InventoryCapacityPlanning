@@ -14,7 +14,9 @@ public static class ControllerResponseMessageHelper
                 (HttpStatusCode.NotFound, notFoundException.Message, null),
             ArgumentException argException =>
                 (HttpStatusCode.BadRequest, argException.Message, null),
-            _ =>
+            InvalidOperationException invalidOperationException =>
+                (HttpStatusCode.BadRequest, invalidOperationException.Message, null),
+        _ =>
                 (HttpStatusCode.ServiceUnavailable, "Service Unavailable", new List<string> { exception.Message })
         };
 

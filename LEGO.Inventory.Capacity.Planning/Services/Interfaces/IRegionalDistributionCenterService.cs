@@ -1,7 +1,6 @@
-﻿namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces
+﻿namespace LEGO.Inventory.Capacity.Planning.Services.Interfaces;
+
+public interface IRegionalDistributionCenterService
 {
-    public interface IRegionalDistributionCenterService
-    {
-        int TryPickSTO(Guid stockTransportOrderId);
-    }
+    Task<int> TryPickSTOAsync(Guid stockTransportOrderId);
 }

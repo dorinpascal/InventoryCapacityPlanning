@@ -2,38 +2,38 @@
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
-namespace LEGO.Inventory.Capacity.Planning.Services
+namespace LEGO.Inventory.Capacity.Planning.Services;
+
+public class RegionalDistributionCenterService(IRegionalDistributionCenterStorage _regionalDistributionCenterStorage, IStockTransportOrderStorage _stockTransportOrderStorage, ILogger<RegionalDistributionCenterService> _logger) : IRegionalDistributionCenterService
 {
-    public class RegionalDistributionCenterService : IRegionalDistributionCenterService
+    public async Task<int> TryPickSTOAsync(Guid stockTransportOrderId)
     {
-        private readonly IRegionalDistributionCenterStorage _storage;
-        private readonly ILogger<RegionalDistributionCenterService> _logger;
+        // Retrieve the STO from storage
+        var stockTransportOrders = await _stockTransportOrderStorage.GetAllAsync();
+        var stockTransportOrder = stockTransportOrders.Find(sto => sto.Id == stockTransportOrderId)
+            ?? throw new ArgumentException("Missing stock transport order");
 
-        public RegionalDistributionCenterService(IRegionalDistributionCenterStorage storage, ILogger<RegionalDistributionCenterService> logger)
+        // Retrieve the regional distribution center
+        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAllAsync();
+
+        // Check if there's enough stock to pick the STO
+        if (stockTransportOrder.Quantity > regionalDistributionCenter.FinishedGoodsStockQuantity)
         {
-            _storage = storage;
-            _logger = logger;
+            throw new InvalidOperationException(
+                $@"Couldn't pick stock transport order {stockTransportOrder.Id}. 
+                    Insufficient stock for product {regionalDistributionCenter.FinishedGoodsName}.
+                    Ordered stock: {stockTransportOrder.Quantity}, current stock: {regionalDistributionCenter.FinishedGoodsStockQuantity}");
         }
 
-        public int TryPickSTO(Guid stockTransportOrderId)
-        {
-            var stockTransportOrder = _storage.StockTransportOrders.FirstOrDefault(sto => sto.Id == stockTransportOrderId) ?? throw new Exception("Missing stock transport order");
-            if (stockTransportOrder.Quantity > _storage.RegionalDistributionCenter.FinishedGoodsStockQuantity)
-            {
-                _logger.LogError($@"Couldn't pick stock transport order {stockTransportOrder.Id}. Insufficient stock for product {_storage.RegionalDistributionCenter.FinishedGoodsName}.
-Ordered stock: {stockTransportOrder.Quantity}, current stock: {_storage.RegionalDistributionCenter.FinishedGoodsStockQuantity}");
-                throw new Exception(
-    $@"Couldn't pick stock transport order {stockTransportOrder.Id}. Insufficient stock for product {_storage.RegionalDistributionCenter.FinishedGoodsName}.
-Ordered stock: {stockTransportOrder.Quantity}, current stock: {_storage.RegionalDistributionCenter.FinishedGoodsStockQuantity}");
+        // Update the STO status to Picked
+        stockTransportOrder.UpdateStatus(StockTransportOrderStatus.Picked);
+        await _stockTransportOrderStorage.AddAsync(stockTransportOrder);
 
-            }
+        // Update the regional distribution center's stock quantity
+        regionalDistributionCenter.UpdateQuantity(regionalDistributionCenter.FinishedGoodsStockQuantity - stockTransportOrder.Quantity);
 
-            stockTransportOrder.UpdateStatus(StockTransportOrderStatus.Picked);
+        _logger.LogInformation($"STO with Id: {stockTransportOrder.Id} has been picked. Remaining stock: {regionalDistributionCenter.FinishedGoodsStockQuantity}");
 
-            _storage.RegionalDistributionCenter.UpdateQuantity(_storage.RegionalDistributionCenter.FinishedGoodsStockQuantity - stockTransportOrder.Quantity);
-
-
-            return stockTransportOrder.Quantity;
-        }
+        return stockTransportOrder.Quantity;
     }
 }

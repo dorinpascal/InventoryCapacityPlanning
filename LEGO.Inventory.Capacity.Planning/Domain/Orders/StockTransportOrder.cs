@@ -6,14 +6,9 @@ public enum StockTransportOrderStatus
     Picked
 }
 
-
 public class StockTransportOrder
 {
-    public StockTransportOrder(
-        string finishedGoodsName,
-        int quantity,
-        string regionalDistributionCenterName,
-        string localDistributionCenterName)
+    public StockTransportOrder( string finishedGoodsName,int quantity,string regionalDistributionCenterName, string localDistributionCenterName)
     {
         Id = Guid.NewGuid();
         FinishedGoodsName = finishedGoodsName;
