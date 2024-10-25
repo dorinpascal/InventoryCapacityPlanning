@@ -15,7 +15,7 @@ public class GoodsReceiptController(ILogger<GoodsReceiptController> _logger, IGo
         try
         {
             var goodsReceipts = await _goodsReceiptService.GetAll();
-            var dto = _mapper.Map<GoodsReceiptDto>(goodsReceipts);
+            var dto = _mapper.Map<List<GoodsReceiptDto>>(goodsReceipts);
             return new OkObjectResult(dto);
         }
         catch (Exception ex)

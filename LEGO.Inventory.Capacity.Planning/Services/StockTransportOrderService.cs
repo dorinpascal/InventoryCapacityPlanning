@@ -35,7 +35,7 @@ public class StockTransportOrderService(IStockTransportOrderStorage _stockTransp
         {
             throw new InvalidOperationException("Stock transport order must be open to be picked.");
         }
-        var rdc = await _regionalDistributionCenterStorage.GetAllAsync();
+        var rdc = await _regionalDistributionCenterStorage.GetAsync();
         if (sto.Quantity > rdc.FinishedGoodsStockQuantity)
         {
             throw new InvalidOperationException("Insufficient stock at the RDC to fulfill the stock transport order.");

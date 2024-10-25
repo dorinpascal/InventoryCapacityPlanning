@@ -5,7 +5,7 @@ namespace LEGO.Inventory.Capacity.Planning.Storage;
 
 public class GoodsReceiptStorage : IGoodsReceiptStorage
 {
-    private readonly List<GoodsReceipt> _goodsReceipts = [];
+    private static readonly List<GoodsReceipt> _goodsReceipts = [];
 
     public Task AddAsync(GoodsReceipt goodsReceipt)
     {

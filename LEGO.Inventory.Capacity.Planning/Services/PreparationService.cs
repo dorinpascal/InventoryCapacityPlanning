@@ -54,7 +54,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
 
     private async Task CreateStoAsync(SalesOrder salesOrder, LocalDistributionCenter localDistributionCenter, int requiredQuantity)
     {
-        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAllAsync();
+        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAsync();
 
         var stockTransportOrder = new StockTransportOrder( salesOrder.FinishedGoodsName, requiredQuantity, regionalDistributionCenter.Name, localDistributionCenter.Name);
 

@@ -8,6 +8,7 @@ public class GoodsReceiptProfile : Profile
 {
     public GoodsReceiptProfile()
     {
-        CreateMap<GoodsReceipt, GoodsReceiptDto>();
+        CreateMap<GoodsReceipt, GoodsReceiptDto>()
+                            .ForCtorParam(nameof(GoodsReceiptDto.StockTransportOrderId), opt => opt.MapFrom(src => src.StockTransportOrderId.ToString()));
     }
 }

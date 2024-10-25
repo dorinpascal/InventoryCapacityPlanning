@@ -14,7 +14,7 @@ public class RegionalDistributionCenterService(IRegionalDistributionCenterStorag
             ?? throw new ArgumentException("Missing stock transport order");
 
         // Retrieve the regional distribution center
-        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAllAsync();
+        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAsync();
 
         // Check if there's enough stock to pick the STO
         if (stockTransportOrder.Quantity > regionalDistributionCenter.FinishedGoodsStockQuantity)

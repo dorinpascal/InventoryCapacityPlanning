@@ -10,7 +10,7 @@ namespace LEGO.Inventory.Capacity.Planning.Controllers;
 public class RegionalDistributionCenterController(ILogger<RegionalDistributionCenterController> _logger, IRegionalDistributionCenterService _regionalDistributionCenterService, IGoodsReceiptService _goodsReceiptService) : Controller
 {
     [HttpPost()]
-    public async Task<IActionResult> HandleStockTransportOrder([FromBody] Guid stockTransportOrderId)
+    public async Task<IActionResult> HandleStockTransportOrder([FromQuery] Guid stockTransportOrderId)
     {
         try
         {
@@ -21,7 +21,7 @@ public class RegionalDistributionCenterController(ILogger<RegionalDistributionCe
             }
             _logger.LogInformation($"Order --" + stockTransportOrderId.ToString() + "-- is being picked");
             _logger.LogInformation($"Quantity left: {quantityLeft}");
-            await _goodsReceiptService.Create(new GoodsReceipt(stockTransportOrderId));
+            await _goodsReceiptService.Create(new GoodsReceipt { StockTransportOrderId = stockTransportOrderId});
 
             _logger.LogInformation($"Stock transport order --{stockTransportOrderId}" + $"-- Has been finished");
 

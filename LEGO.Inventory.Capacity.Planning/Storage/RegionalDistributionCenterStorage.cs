@@ -8,7 +8,7 @@ public class RegionalDistributionCenterStorage : IRegionalDistributionCenterStor
     private readonly RegionalDistributionCenter _regionalDistributionCenter =
         new("LEGO European Distribution Center", "Lego - Harry Potter", 10);
 
-    public Task<RegionalDistributionCenter> GetAllAsync()
+    public Task<RegionalDistributionCenter> GetAsync()
     {
         return Task.FromResult(_regionalDistributionCenter);
     }
