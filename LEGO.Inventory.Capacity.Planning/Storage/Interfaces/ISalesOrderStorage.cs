@@ -5,5 +5,5 @@ namespace LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 public interface ISalesOrderStorage
 {
     Task<List<SalesOrder>> GetAllAsync();
-    Task AddAsync(SalesOrder salesOrder);
+    Task<SalesOrder> AddAsync(SalesOrder salesOrder);
 }

@@ -13,18 +13,20 @@ public interface IStockTransportOrderService
     Task<List<StockTransportOrder>> GetByLDC(string localDistributionCenterName, string? status = null);
 
     /// <summary>
-    /// Creates a new stock transport order and adds it to the storage.
+    /// Creates a new stock transport order and adds it to the storage, returning the created order.
     /// </summary>
     /// <param name="stockTransportOrder">The stock transport order to be created and added to the storage.</param>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    Task Create(StockTransportOrder stockTransportOrder);
+    /// <returns>A <see cref="Task{StockTransportOrder}"/> representing the asynchronous operation, with the created <see cref="StockTransportOrder"/> object as the result.</returns>
+    Task<StockTransportOrder> Create(StockTransportOrder stockTransportOrder);
 
     /// <summary>
-    /// Picks a stock transport order by its unique identifier, updating its status to indicate it has been picked.
+    /// Picks a stock transport order by its unique identifier, updating its status to indicate it has been picked,
+    /// and returns the updated order.
     /// </summary>
     /// <param name="id">The unique identifier of the stock transport order to pick.</param>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    /// <returns>A <see cref="Task{StockTransportOrder}"/> representing the asynchronous operation, with the updated <see cref="StockTransportOrder"/> object as the result.</returns>
     /// <exception cref="ArgumentException">Thrown when the stock transport order with the specified ID is not found.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the stock transport order cannot be picked due to insufficient stock or incorrect status.</exception>
-    Task PickStockTransportOrder(Guid id);
+    Task<StockTransportOrder> PickStockTransportOrder(Guid id);
+
 }

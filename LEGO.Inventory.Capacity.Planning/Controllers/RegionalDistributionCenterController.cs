@@ -1,4 +1,5 @@
-﻿using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
+﻿using AutoMapper;
+using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
 using LEGO.Inventory.Capacity.Planning.Helpers;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
 [ApiController]
 [Route("stock-transport-order")]
-public class RegionalDistributionCenterController(ILogger<RegionalDistributionCenterController> _logger, IRegionalDistributionCenterService _regionalDistributionCenterService, IGoodsReceiptService _goodsReceiptService) : Controller
+public class RegionalDistributionCenterController(ILogger<RegionalDistributionCenterController> _logger, IRegionalDistributionCenterService _regionalDistributionCenterService, IGoodsReceiptService _goodsReceiptService, IMapper _mapper) : Controller
 {
     [HttpPost()]
     public async Task<IActionResult> HandleStockTransportOrder([FromQuery] Guid stockTransportOrderId)
@@ -21,11 +22,10 @@ public class RegionalDistributionCenterController(ILogger<RegionalDistributionCe
             }
             _logger.LogInformation($"Order --" + stockTransportOrderId.ToString() + "-- is being picked");
             _logger.LogInformation($"Quantity left: {quantityLeft}");
-            await _goodsReceiptService.Create(new GoodsReceipt { StockTransportOrderId = stockTransportOrderId});
-
+            var goodsReceipt = await _goodsReceiptService.Create(new GoodsReceipt { StockTransportOrderId = stockTransportOrderId});
             _logger.LogInformation($"Stock transport order --{stockTransportOrderId}" + $"-- Has been finished");
-
-            return new CreatedResult();
+            var dto = _mapper.Map<GoodsReceipt>(goodsReceipt);
+            return new OkObjectResult(dto);
         }
         catch (Exception ex)
         {

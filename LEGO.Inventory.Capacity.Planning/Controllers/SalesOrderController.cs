@@ -17,11 +17,11 @@ public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesO
         try
         {
             var newSalesOrder = _mapper.Map<SalesOrder>(salesOrder);
-            await _salesOrderService.Create(newSalesOrder);
-            await _preparationService.Prepare(newSalesOrder);
+            var order = await _salesOrderService.Create(newSalesOrder);
+            await _preparationService.Prepare(order);
             _logger.LogInformation($"Sales order created successfully for {salesOrder.FinishedGoodsName}");
-
-            return new CreatedResult();
+            var dto = _mapper.Map<SalesOrderDto>(order);
+            return new OkObjectResult(dto);
         }
         catch (Exception ex)
         {

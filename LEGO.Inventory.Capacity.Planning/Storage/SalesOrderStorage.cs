@@ -7,10 +7,10 @@ public class SalesOrderStorage : ISalesOrderStorage
 {
     private static readonly List<SalesOrder> _salesOrders = [];
 
-    public Task AddAsync(SalesOrder salesOrder)
+    public Task<SalesOrder> AddAsync(SalesOrder salesOrder)
     {
         _salesOrders.Add(salesOrder);
-        return Task.CompletedTask;
+        return Task.FromResult(salesOrder);
     }
 
     public Task<List<SalesOrder>> GetAllAsync()

@@ -7,10 +7,10 @@ public class GoodsReceiptStorage : IGoodsReceiptStorage
 {
     private static readonly List<GoodsReceipt> _goodsReceipts = [];
 
-    public Task AddAsync(GoodsReceipt goodsReceipt)
+    public Task<GoodsReceipt> AddAsync(GoodsReceipt goodsReceipt)
     {
         _goodsReceipts.Add(goodsReceipt);
-        return Task.CompletedTask;
+        return Task.FromResult(goodsReceipt);
     }
 
     public Task<List<GoodsReceipt>> GetAllAsync()

@@ -8,12 +8,12 @@ public interface IGoodsReceiptService
     /// Creates a new goods receipt entry.
     /// </summary>
     /// <param name="goodsReceipt">The goods receipt to be created, containing details about the completed stock transport order.</param>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    /// <returns>A <see cref="Task{GoodsReceipt}"/> representing the asynchronous operation, with the created <see cref="GoodsReceipt"/> object as the result.</returns>
     /// <remarks>
     /// This method adds a new entry for a goods receipt, which typically involves updating
     /// stock levels and marking associated stock transport orders as received.
     /// </remarks>
-    Task Create(GoodsReceipt goodsReceipt);
+    Task<GoodsReceipt> Create(GoodsReceipt goodsReceipt);
 
     /// <summary>
     /// Retrieves all goods receipt entries.

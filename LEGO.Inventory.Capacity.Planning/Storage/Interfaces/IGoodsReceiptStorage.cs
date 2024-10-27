@@ -4,6 +4,6 @@ namespace LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 public interface IGoodsReceiptStorage
 {
-    Task AddAsync(GoodsReceipt goodsReceipt);
+    Task<GoodsReceipt> AddAsync(GoodsReceipt goodsReceipt);
     Task<List<GoodsReceipt>> GetAllAsync();
 }

@@ -21,12 +21,12 @@ public class StockTransportOrderService(IStockTransportOrderStorage _stockTransp
         return query.ToList();
     }
 
-    public async Task Create(StockTransportOrder stockTransportOrder)
+    public async Task<StockTransportOrder> Create(StockTransportOrder stockTransportOrder)
     {
-        await _stockTransportOrderStorage.AddAsync(stockTransportOrder);
+        return await _stockTransportOrderStorage.AddAsync(stockTransportOrder);
     }
 
-    public async Task PickStockTransportOrder(Guid id)
+    public async Task<StockTransportOrder> PickStockTransportOrder(Guid id)
     {
         var sto = await _stockTransportOrderStorage.GetByIdAsync(id) ?? throw new ArgumentException($"Stock transport order with ID {id} not found.");
 
@@ -50,6 +50,7 @@ public class StockTransportOrderService(IStockTransportOrderStorage _stockTransp
         await _regionalDistributionCenterStorage.UpdateAsync(rdc);
 
         // Persist the changes in the storage
-        await _stockTransportOrderStorage.UpdateAsync(sto);
+        var stockTransportOrder =  await _stockTransportOrderStorage.UpdateAsync(sto);
+        return stockTransportOrder;
     }
 }

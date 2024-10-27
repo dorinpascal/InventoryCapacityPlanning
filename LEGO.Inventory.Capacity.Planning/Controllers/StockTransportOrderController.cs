@@ -30,9 +30,10 @@ public class StockTransportOrderController(ILogger<StockTransportOrderController
     {
         try
         {
-            await _stockTransportOrderService.PickStockTransportOrder(id);
+            var stOrder = await _stockTransportOrderService.PickStockTransportOrder(id);
             _logger.LogInformation($"STO with ID {id} picked successfully.");
-            return new OkObjectResult("STO picked successfully.");
+            var dto = _mapper.Map<StockTransportOrderDto>(stOrder);
+            return new OkObjectResult(dto);
         }
         catch (Exception ex)
         {
