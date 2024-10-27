@@ -48,7 +48,8 @@ public class SalesOrderServiceTests
 
         // Assert
         _mockSalesOrderStorage.Verify(s => s.AddAsync(salesOrder), Times.Once);
-        _mockLogger.VerifyLog(LogLevel.Information, $"new order created: {salesOrder.FinishedGoodsName} : {salesOrder.Quantity} -LDC: {salesOrder.LocalDistributionCenterName}", Times.Once());
+        _mockLogger.VerifyLog(LogLevel.Information,
+            $"New sales order created. FinishedGoods: {salesOrder.FinishedGoodsName}, Quantity: {salesOrder.Quantity}, LocalDistributionCenter: {salesOrder.LocalDistributionCenterName}", Times.Once());
     }
 
     [Fact]
@@ -63,11 +64,12 @@ public class SalesOrderServiceTests
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.Create(salesOrder));
-        Assert.Equal("Invalid local distribution center name", ex.Message);
+        Assert.Equal($"Invalid local distribution center name: {salesOrder.LocalDistributionCenterName}", ex.Message);
 
         _mockSalesOrderStorage.Verify(s => s.AddAsync(It.IsAny<SalesOrder>()), Times.Never);
         _mockLogger.VerifyLog(LogLevel.Information, It.IsAny<string>(), Times.Never());
     }
+
 
     [Fact]
     public async Task GetAllAsync_ShouldReturnListOfSalesOrders()

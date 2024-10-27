@@ -14,14 +14,33 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
 
     public async Task<GoodsReceipt> Create(GoodsReceipt goodsReceipt)
     {
-        var stockTransportOrder = await _transportOrderStorage.GetByIdAsync(goodsReceipt.StockTransportOrderId) ?? throw new ArgumentException("Missing stock transport order");
+        // Fetch the stock transport order, throw exception if not found
+        var stockTransportOrder = await _transportOrderStorage.GetByIdAsync(goodsReceipt.StockTransportOrderId)
+            ?? throw new ArgumentException($"Stock transport order with ID {goodsReceipt.StockTransportOrderId} not found");
+
+        // Only update the distribution center if the stock transport order has been picked
         if (stockTransportOrder.Status == StockTransportOrderStatus.Picked)
         {
-            var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");
-            localDistributionCenter.FinishedGoodsStockQuantity += stockTransportOrder.Quantity; // Update Finished Goods Stock
-            localDistributionCenter.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold; // Restore Safety Stock
-            logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " + localDistributionCenter.SafetyStockQuantity);
+            var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName)
+                ?? throw new ArgumentException($"Local distribution center '{stockTransportOrder.LocalDistributionCenterName}' not found");
+
+            // Update stock quantities
+            localDistributionCenter.FinishedGoodsStockQuantity += stockTransportOrder.Quantity;
+            localDistributionCenter.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold;
+
+            // Structured log for clear context
+            logger.LogInformation(
+                "Updated stock for {LDCName}: Finished Goods Stock = {StockQuantity}, Safety Stock = {SafetyStockQuantity}",localDistributionCenter.Name, localDistributionCenter.FinishedGoodsStockQuantity, localDistributionCenter.SafetyStockQuantity);
         }
-        return await _goodsReceiptStorage.AddAsync(goodsReceipt);
+        else
+        {
+            logger.LogWarning("Stock transport order with ID {STOId} has not been picked, so no stock update was applied", goodsReceipt.StockTransportOrderId);
+        }
+
+        // Add goods receipt to storage and log result
+        var createdGoodsReceipt = await _goodsReceiptStorage.AddAsync(goodsReceipt);
+        logger.LogInformation("Goods receipt with ID {GoodsReceiptId} created for stock transport order {STOId}", createdGoodsReceipt.StockTransportOrderId, goodsReceipt.StockTransportOrderId);
+
+        return createdGoodsReceipt;
     }
 }

@@ -41,6 +41,7 @@ public class RegionalDistributionCenterControllerTests
         var stockTransportOrderId = _fixture.Create<Guid>();
         var quantityLeft = _fixture.Create<int>();
         var goodsReceipt = _fixture.Create<GoodsReceipt>();
+
         _mockRegionalDistributionCenterService
             .Setup(s => s.TryPickSTOAsync(stockTransportOrderId))
             .ReturnsAsync(quantityLeft);
@@ -54,11 +55,20 @@ public class RegionalDistributionCenterControllerTests
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
-        _mockLogger.VerifyLog(LogLevel.Information, $"Order --{stockTransportOrderId}-- is being picked", Times.Once());
-        _mockLogger.VerifyLog(LogLevel.Information, $"Quantity left: {quantityLeft}", Times.Once());
+
+        // Verify logs with structured data
+        _mockLogger.VerifyLog(LogLevel.Information,
+            $"Order {stockTransportOrderId} is being picked", Times.Once());
+
+        _mockLogger.VerifyLog(LogLevel.Information,
+            $"Quantity left: {quantityLeft}", Times.Once());
+
         _mockGoodsReceiptService.Verify(s => s.Create(It.Is<GoodsReceipt>(gr => gr.StockTransportOrderId == stockTransportOrderId)), Times.Once());
-        _mockLogger.VerifyLog(LogLevel.Information, $"Stock transport order --{stockTransportOrderId}-- Has been finished", Times.Once());
+
+        _mockLogger.VerifyLog(LogLevel.Information,
+            $"Stock transport order {stockTransportOrderId} has been completed", Times.Once());
     }
+
 
     [Fact]
     public async Task HandleStockTransportOrder_WithInsufficientStock_ShouldBadRequest()

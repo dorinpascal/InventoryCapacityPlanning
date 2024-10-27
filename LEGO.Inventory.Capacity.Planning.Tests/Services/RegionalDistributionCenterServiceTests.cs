@@ -31,7 +31,8 @@ public class RegionalDistributionCenterServiceTests
         var stoId = Guid.NewGuid();
         var stockTransportOrder = new StockTransportOrder(stoId, "Lego - Harry Potter", 10, "LEGO European Distribution Center", "Central Warehouse Europe", StockTransportOrderStatus.Open);
         var rdc = new RegionalDistributionCenter("LEGO European Distribution Center", "Lego - Harry Potter", 20);
-        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync([stockTransportOrder]);
+
+        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<StockTransportOrder> { stockTransportOrder });
         _mockRdcStorage.Setup(s => s.GetAsync()).ReturnsAsync(rdc);
         _mockStoStorage.Setup(s => s.AddAsync(It.IsAny<StockTransportOrder>())).ReturnsAsync(stockTransportOrder);
         _mockRdcStorage.Setup(s => s.UpdateAsync(rdc)).Returns(Task.CompletedTask);
@@ -43,7 +44,10 @@ public class RegionalDistributionCenterServiceTests
         Assert.Equal(10, quantityPicked); // Ensure the correct quantity was picked
         Assert.Equal(10, rdc.FinishedGoodsStockQuantity); // Ensure RDC stock was updated
         _mockStoStorage.Verify(s => s.AddAsync(It.Is<StockTransportOrder>(sto => sto.Status == StockTransportOrderStatus.Picked)), Times.Once);
-        _mockLogger.VerifyLog(LogLevel.Information, $"STO with Id: {stoId} has been picked. Remaining stock: {rdc.FinishedGoodsStockQuantity}", Times.Once());
+
+        _mockLogger.VerifyLog(LogLevel.Information,
+            $"STO {stoId} picked successfully. Quantity picked: 10. Remaining stock at RDC {rdc.Name}: {rdc.FinishedGoodsStockQuantity}",
+            Times.Once());
     }
 
     [Fact]
@@ -54,12 +58,12 @@ public class RegionalDistributionCenterServiceTests
         var stockTransportOrder = new StockTransportOrder(stoId, "Lego - Harry Potter", 25, "LEGO European Distribution Center", "Central Warehouse Europe", StockTransportOrderStatus.Open);
         var rdc = new RegionalDistributionCenter("LEGO European Distribution Center", "Lego - Harry Potter", 20);
 
-        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync([stockTransportOrder]);
+        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<StockTransportOrder> { stockTransportOrder });
         _mockRdcStorage.Setup(s => s.GetAsync()).ReturnsAsync(rdc);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.TryPickSTOAsync(stoId));
-        Assert.Contains("Insufficient stock for product", exception.Message);
+        Assert.Contains($"Insufficient stock for STO {stoId}", exception.Message);
 
         _mockStoStorage.Verify(s => s.AddAsync(It.IsAny<StockTransportOrder>()), Times.Never); // Ensure no changes to STO status
         _mockLogger.VerifyLog(LogLevel.Information, It.IsAny<string>(), Times.Never());
@@ -70,12 +74,13 @@ public class RegionalDistributionCenterServiceTests
     {
         // Arrange
         var stoId = Guid.NewGuid();
-        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync([]);
+        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<StockTransportOrder>());
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(() => _service.TryPickSTOAsync(stoId));
-        Assert.Equal("Missing stock transport order", exception.Message);
+        Assert.Equal($"Stock transport order with ID {stoId} not found", exception.Message);
 
         _mockLogger.VerifyLog(LogLevel.Information, It.IsAny<string>(), Times.Never());
     }
+
 }

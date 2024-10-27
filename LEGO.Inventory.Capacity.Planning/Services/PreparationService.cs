@@ -23,6 +23,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
         LogStockQuantities(localDistributionCenter);
     }
 
+    #region private
     private async Task<int> HandleStockReductionAsync(LocalDistributionCenter localDistributionCenter, int orderedQuantity)
     {
         var requiredQuantity = 0;
@@ -72,4 +73,5 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
         _logger.LogWarning("{LDC}'s updated safety stock quantity: {SafetyStockQuantity}",
             localDistributionCenter.Name, localDistributionCenter.SafetyStockQuantity);
     }
+    #endregion
 }

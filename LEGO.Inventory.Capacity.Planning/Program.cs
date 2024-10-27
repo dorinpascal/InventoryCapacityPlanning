@@ -2,7 +2,6 @@ using LEGO.Inventory.Capacity.Planning.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Logging.ClearProviders(); // Clear default providers
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .WriteTo.Console()
