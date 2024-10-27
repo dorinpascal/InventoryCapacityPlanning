@@ -12,11 +12,6 @@ public class LocalDistributionCenterStorage : ILocalDistributionCenterStorage
         new LocalDistributionCenter("Western Warehouse Europe", "LEGO European Distribution Center", "Lego - Harry Potter", 70, 20, 20)
   ];
 
-    public Task<List<LocalDistributionCenter>> GetAllAsync()
-    {
-        return Task.FromResult(_localDistributionCenters);
-    }
-
     public Task<LocalDistributionCenter?> GetByNameAsync(string name)
     {
         var ldc = _localDistributionCenters.Find(x => x.Name == name);
