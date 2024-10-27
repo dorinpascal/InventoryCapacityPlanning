@@ -1,7 +1,7 @@
-﻿using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Services;
-using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
+﻿using LEGO.Inventory.Capacity.Planning.Services;
+using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage;
+using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 using Microsoft.OpenApi.Models;
 
 namespace LEGO.Inventory.Capacity.Planning.Extensions;

@@ -14,7 +14,7 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
 
     public async Task<GoodsReceipt> Create(GoodsReceipt goodsReceipt)
     {
-        var stockTransportOrder = await _transportOrderStorage.GetByIdAsync(goodsReceipt.StockTransportOrderId) ?? throw new ArgumentException("Missing stock transport order");            
+        var stockTransportOrder = await _transportOrderStorage.GetByIdAsync(goodsReceipt.StockTransportOrderId) ?? throw new ArgumentException("Missing stock transport order");
         if (stockTransportOrder.Status == StockTransportOrderStatus.Picked)
         {
             var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");

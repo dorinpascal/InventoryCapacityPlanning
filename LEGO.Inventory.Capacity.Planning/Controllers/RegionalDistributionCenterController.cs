@@ -22,7 +22,7 @@ public class RegionalDistributionCenterController(ILogger<RegionalDistributionCe
             }
             _logger.LogInformation($"Order --" + stockTransportOrderId.ToString() + "-- is being picked");
             _logger.LogInformation($"Quantity left: {quantityLeft}");
-            var goodsReceipt = await _goodsReceiptService.Create(new GoodsReceipt { StockTransportOrderId = stockTransportOrderId});
+            var goodsReceipt = await _goodsReceiptService.Create(new GoodsReceipt { StockTransportOrderId = stockTransportOrderId });
             _logger.LogInformation($"Stock transport order --{stockTransportOrderId}" + $"-- Has been finished");
             var dto = _mapper.Map<GoodsReceipt>(goodsReceipt);
             return new OkObjectResult(dto);

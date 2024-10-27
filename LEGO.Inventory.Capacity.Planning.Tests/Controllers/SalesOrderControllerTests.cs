@@ -34,25 +34,31 @@ public class SalesOrderControllerTests
     }
 
     [Fact]
-    public async Task Create_WithValidSalesOrderRequest_ShouldReturnCreatedResult()
+    public async Task Create_WithValidSalesOrderRequest_ShouldReturnOkObjectResult()
     {
         // Arrange
         var salesOrderRequestDto = _fixture.Create<SalesOrderRequestDto>();
         var salesOrder = _fixture.Create<SalesOrder>();
+        var salesOrderDto = _fixture.Create<SalesOrderDto>();
 
         _mockMapper.Setup(m => m.Map<SalesOrder>(salesOrderRequestDto)).Returns(salesOrder);
-        _mockSalesOrderService.Setup(s => s.Create(salesOrder)).Returns(Task.CompletedTask);
+        _mockSalesOrderService.Setup(s => s.Create(salesOrder)).ReturnsAsync(salesOrder);
         _mockPreparationService.Setup(s => s.Prepare(salesOrder)).Returns(Task.CompletedTask);
+        _mockMapper.Setup(m => m.Map<SalesOrderDto>(salesOrder)).Returns(salesOrderDto);
 
         // Act
         var result = await _controller.Create(salesOrderRequestDto);
 
         // Assert
-        Assert.IsType<CreatedResult>(result);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var returnedDto = Assert.IsType<SalesOrderDto>(okResult.Value);
+
+        Assert.Equal(salesOrderDto, returnedDto);
         _mockSalesOrderService.Verify(s => s.Create(salesOrder), Times.Once);
         _mockPreparationService.Verify(s => s.Prepare(salesOrder), Times.Once);
         _mockLogger.VerifyLog(LogLevel.Information, $"Sales order created successfully for", Times.Once());
     }
+
 
     [Fact]
     public async Task Create_WhenServiceThrowsArgumentException_ShouldReturnBadRequest()

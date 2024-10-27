@@ -5,7 +5,6 @@ using LEGO.Inventory.Capacity.Planning.Domain;
 using LEGO.Inventory.Capacity.Planning.Dtos.StockTransportOrders;
 using LEGO.Inventory.Capacity.Planning.Models;
 using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Tests.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -74,21 +73,28 @@ public class StockTransportOrderControllerTests
     }
 
     [Fact]
-    public async Task PickStockTransportOrder_WithValidId_ShouldReturnOkResult()
+    public async Task PickStockTransportOrder_WithValidId_ShouldReturnOkObjectResult()
     {
         // Arrange
         var id = _fixture.Create<Guid>();
+        var sto = _fixture.Create<StockTransportOrder>();
+        var stoDto = _fixture.Create<StockTransportOrderDto>();
 
-        _mockStockTransportOrderService.Setup(s => s.PickStockTransportOrder(id)).Returns(Task.CompletedTask);
+        _mockStockTransportOrderService.Setup(s => s.PickStockTransportOrder(id)).ReturnsAsync(sto);
+        _mockMapper.Setup(m => m.Map<StockTransportOrderDto>(sto)).Returns(stoDto);
 
         // Act
         var result = await _controller.PickStockTransportOrder(id);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.Equal("STO picked successfully.", okResult.Value);
-        _mockLogger.VerifyLog(LogLevel.Information, $"STO with ID {id} picked successfully.", Times.Once());
+        var returnedDto = Assert.IsType<StockTransportOrderDto>(okResult.Value);
+
+        Assert.Equal(stoDto, returnedDto);
+        _mockStockTransportOrderService.Verify(s => s.PickStockTransportOrder(id), Times.Once);
+        _mockMapper.Verify(m => m.Map<StockTransportOrderDto>(sto), Times.Once);
     }
+
 
     [Fact]
     public async Task PickStockTransportOrder_WhenServiceThrowsException_ShouldReturnServiceUnavailable()

@@ -41,7 +41,7 @@ public class SalesOrderServiceTests
 
         _mockSalesOrderStorage
             .Setup(s => s.AddAsync(It.IsAny<SalesOrder>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(salesOrder);
 
         // Act
         await _service.Create(salesOrder);

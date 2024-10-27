@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using AutoMapper;
 using LEGO.Inventory.Capacity.Planning.Controllers;
 using LEGO.Inventory.Capacity.Planning.Domain.GoodsMovement;
 using LEGO.Inventory.Capacity.Planning.Models;
@@ -17,6 +18,7 @@ public class RegionalDistributionCenterControllerTests
     private readonly Mock<IRegionalDistributionCenterService> _mockRegionalDistributionCenterService;
     private readonly Mock<IGoodsReceiptService> _mockGoodsReceiptService;
     private readonly Mock<ILogger<RegionalDistributionCenterController>> _mockLogger;
+    private readonly Mock<IMapper> _mockMapper;
     private readonly RegionalDistributionCenterController _controller;
 
     public RegionalDistributionCenterControllerTests()
@@ -25,10 +27,11 @@ public class RegionalDistributionCenterControllerTests
         _mockRegionalDistributionCenterService = _fixture.Freeze<Mock<IRegionalDistributionCenterService>>();
         _mockGoodsReceiptService = _fixture.Freeze<Mock<IGoodsReceiptService>>();
         _mockLogger = _fixture.Freeze<Mock<ILogger<RegionalDistributionCenterController>>>();
+        _mockMapper = _fixture.Freeze<Mock<IMapper>>();
         _controller = new RegionalDistributionCenterController(
             _mockLogger.Object,
             _mockRegionalDistributionCenterService.Object,
-            _mockGoodsReceiptService.Object);
+            _mockGoodsReceiptService.Object, _mockMapper.Object);
     }
 
     [Fact]
@@ -37,20 +40,20 @@ public class RegionalDistributionCenterControllerTests
         // Arrange
         var stockTransportOrderId = _fixture.Create<Guid>();
         var quantityLeft = _fixture.Create<int>();
-
+        var goodsReceipt = _fixture.Create<GoodsReceipt>();
         _mockRegionalDistributionCenterService
             .Setup(s => s.TryPickSTOAsync(stockTransportOrderId))
             .ReturnsAsync(quantityLeft);
 
         _mockGoodsReceiptService
             .Setup(s => s.Create(It.IsAny<GoodsReceipt>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(goodsReceipt);
 
         // Act
         var result = await _controller.HandleStockTransportOrder(stockTransportOrderId);
 
         // Assert
-        Assert.IsType<CreatedResult>(result);
+        Assert.IsType<OkObjectResult>(result);
         _mockLogger.VerifyLog(LogLevel.Information, $"Order --{stockTransportOrderId}-- is being picked", Times.Once());
         _mockLogger.VerifyLog(LogLevel.Information, $"Quantity left: {quantityLeft}", Times.Once());
         _mockGoodsReceiptService.Verify(s => s.Create(It.Is<GoodsReceipt>(gr => gr.StockTransportOrderId == stockTransportOrderId)), Times.Once());

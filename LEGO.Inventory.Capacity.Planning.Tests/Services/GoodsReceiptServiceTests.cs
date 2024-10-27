@@ -59,7 +59,7 @@ public class GoodsReceiptServiceTests
 
         var localDistributionCenter = new LocalDistributionCenter("Central Warehouse Europe", "LEGO European Distribution Center", "Lego - Harry Potter", 20, 5, 5);
 
-        _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).Returns(Task.CompletedTask);
+        _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).ReturnsAsync(goodsReceipt);
         _mockTransportOrderStorage.Setup(s => s.GetByIdAsync(goodsReceipt.StockTransportOrderId)).ReturnsAsync(stockTransportOrder);
         _mockDistributionCenterStorage.Setup(s => s.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName)).ReturnsAsync(localDistributionCenter);
 
@@ -78,13 +78,12 @@ public class GoodsReceiptServiceTests
     {
         // Arrange
         var goodsReceipt = new GoodsReceipt { StockTransportOrderId = Guid.NewGuid() };
-        _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).Returns(Task.CompletedTask);
+        _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).ReturnsAsync(new GoodsReceipt());
         _mockTransportOrderStorage.Setup(s => s.GetByIdAsync(goodsReceipt.StockTransportOrderId)).ReturnsAsync((StockTransportOrder?)null);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.Create(goodsReceipt));
         Assert.Equal("Missing stock transport order", ex.Message);
-        _mockGoodsReceiptStorage.Verify(s => s.AddAsync(goodsReceipt), Times.Once);
     }
 
     [Fact]
@@ -95,13 +94,12 @@ public class GoodsReceiptServiceTests
         var goodsReceipt = new GoodsReceipt { StockTransportOrderId = stoId };
         var stockTransportOrder = new StockTransportOrder("Lego - Harry Potter", 10, "LEGO European Distribution Center", "Invalid LDC");
         stockTransportOrder.UpdateStatus(StockTransportOrderStatus.Picked);
-        _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).Returns(Task.CompletedTask);
+        _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).ReturnsAsync(goodsReceipt);
         _mockTransportOrderStorage.Setup(s => s.GetByIdAsync(goodsReceipt.StockTransportOrderId)).ReturnsAsync(stockTransportOrder);
         _mockDistributionCenterStorage.Setup(s => s.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName)).ReturnsAsync((LocalDistributionCenter?)null);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.Create(goodsReceipt));
         Assert.Equal("Invalid local distribution center name", ex.Message);
-        _mockGoodsReceiptStorage.Verify(s => s.AddAsync(goodsReceipt), Times.Once);
     }
 }

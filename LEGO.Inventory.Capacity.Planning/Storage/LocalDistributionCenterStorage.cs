@@ -27,7 +27,7 @@ public class LocalDistributionCenterStorage : ILocalDistributionCenterStorage
         var existingLdcIndex = _localDistributionCenters.FindIndex(x => x.Name == updatedLdc.Name);
         if (existingLdcIndex != -1)
         {
-            _localDistributionCenters[existingLdcIndex] = updatedLdc; 
+            _localDistributionCenters[existingLdcIndex] = updatedLdc;
         }
         return Task.CompletedTask;
     }

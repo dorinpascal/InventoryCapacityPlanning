@@ -56,7 +56,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
     {
         var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAsync();
 
-        var stockTransportOrder = new StockTransportOrder( salesOrder.FinishedGoodsName, requiredQuantity, regionalDistributionCenter.Name, localDistributionCenter.Name);
+        var stockTransportOrder = new StockTransportOrder(salesOrder.FinishedGoodsName, requiredQuantity, regionalDistributionCenter.Name, localDistributionCenter.Name);
 
         await _stockTransportOrderService.Create(stockTransportOrder);
 
@@ -65,7 +65,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
     }
 
     private void LogStockQuantities(LocalDistributionCenter localDistributionCenter)
-    {   
+    {
         _logger.LogInformation("{LDC}'s updated stock quantity: {StockQuantity}",
             localDistributionCenter.Name, localDistributionCenter.FinishedGoodsStockQuantity);
 

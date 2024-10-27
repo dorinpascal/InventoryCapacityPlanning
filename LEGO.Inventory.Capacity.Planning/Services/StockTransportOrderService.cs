@@ -50,7 +50,7 @@ public class StockTransportOrderService(IStockTransportOrderStorage _stockTransp
         await _regionalDistributionCenterStorage.UpdateAsync(rdc);
 
         // Persist the changes in the storage
-        var stockTransportOrder =  await _stockTransportOrderStorage.UpdateAsync(sto);
+        var stockTransportOrder = await _stockTransportOrderStorage.UpdateAsync(sto);
         return stockTransportOrder;
     }
 }

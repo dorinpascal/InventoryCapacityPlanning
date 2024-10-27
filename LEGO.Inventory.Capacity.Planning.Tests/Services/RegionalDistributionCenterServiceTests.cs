@@ -31,10 +31,9 @@ public class RegionalDistributionCenterServiceTests
         var stoId = Guid.NewGuid();
         var stockTransportOrder = new StockTransportOrder(stoId, "Lego - Harry Potter", 10, "LEGO European Distribution Center", "Central Warehouse Europe", StockTransportOrderStatus.Open);
         var rdc = new RegionalDistributionCenter("LEGO European Distribution Center", "Lego - Harry Potter", 20);
-
-        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<StockTransportOrder> { stockTransportOrder });
+        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync([stockTransportOrder]);
         _mockRdcStorage.Setup(s => s.GetAsync()).ReturnsAsync(rdc);
-        _mockStoStorage.Setup(s => s.AddAsync(It.IsAny<StockTransportOrder>())).Returns(Task.CompletedTask);
+        _mockStoStorage.Setup(s => s.AddAsync(It.IsAny<StockTransportOrder>())).ReturnsAsync(stockTransportOrder);
         _mockRdcStorage.Setup(s => s.UpdateAsync(rdc)).Returns(Task.CompletedTask);
 
         // Act
@@ -55,7 +54,7 @@ public class RegionalDistributionCenterServiceTests
         var stockTransportOrder = new StockTransportOrder(stoId, "Lego - Harry Potter", 25, "LEGO European Distribution Center", "Central Warehouse Europe", StockTransportOrderStatus.Open);
         var rdc = new RegionalDistributionCenter("LEGO European Distribution Center", "Lego - Harry Potter", 20);
 
-        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<StockTransportOrder> { stockTransportOrder });
+        _mockStoStorage.Setup(s => s.GetAllAsync()).ReturnsAsync([stockTransportOrder]);
         _mockRdcStorage.Setup(s => s.GetAsync()).ReturnsAsync(rdc);
 
         // Act & Assert

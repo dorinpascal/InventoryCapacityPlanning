@@ -15,7 +15,7 @@ public class SalesOrderService(ISalesOrderStorage _salesOrderStorage, ILocalDist
     {
         _ = await _distributionCenterStorage.GetByNameAsync(salesOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");
 
-        var newOrder =  await _salesOrderStorage.AddAsync(salesOrder);
+        var newOrder = await _salesOrderStorage.AddAsync(salesOrder);
         _logger.LogInformation($"new order created: " + salesOrder.FinishedGoodsName + " : " + salesOrder.Quantity + " -LDC: " + salesOrder.LocalDistributionCenterName);
         return newOrder;
     }

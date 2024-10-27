@@ -9,8 +9,9 @@ public class SalesOrderProfile : Profile
     public SalesOrderProfile()
     {
         CreateMap<SalesOrder, SalesOrderDto>()
-                .ForCtorParam(nameof(SalesOrderDto.Stock), opt => opt.MapFrom(src => src.FinishedGoodsName))
-                .ForCtorParam(nameof(SalesOrderDto.LocalDistributionCenter), opt => opt.MapFrom(src => src.LocalDistributionCenterName));
+            .ForCtorParam(nameof(SalesOrderDto.Stock), opt => opt.MapFrom(src => src.FinishedGoodsName))
+            .ForCtorParam(nameof(SalesOrderDto.LocalDistributionCenter), opt => opt.MapFrom(src => src.LocalDistributionCenterName));
+
 
         CreateMap<SalesOrderRequestDto, SalesOrder>()
            .ConstructUsing(src => new SalesOrder(src.FinishedGoodsName, src.Quantity, src.LocalDistributionCenterName));
