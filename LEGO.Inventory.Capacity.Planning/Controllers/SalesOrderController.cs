@@ -19,7 +19,10 @@ public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesO
             var newSalesOrder = _mapper.Map<SalesOrder>(salesOrder);
             var order = await _salesOrderService.Create(newSalesOrder);
             await _preparationService.Prepare(order);
-            _logger.LogInformation($"Sales order created successfully for {salesOrder.FinishedGoodsName}");
+
+            _logger.LogInformation("Sales order created successfully for FinishedGoodsName: {FinishedGoodsName}, Quantity: {Quantity}, LDC: {LocalDistributionCenterName}",
+            salesOrder.FinishedGoodsName, salesOrder.Quantity, salesOrder.LocalDistributionCenterName);
+
             var dto = _mapper.Map<SalesOrderDto>(order);
             return new OkObjectResult(dto);
         }
@@ -27,7 +30,6 @@ public class SalesOrderController(ILogger<SalesOrderController> _logger, ISalesO
         {
             return ControllerResponseMessageHelper.HandleException(ex, _logger);
         }
-
     }
 
     [HttpGet()]

@@ -31,7 +31,7 @@ public class StockTransportOrderController(ILogger<StockTransportOrderController
         try
         {
             var stOrder = await _stockTransportOrderService.PickStockTransportOrder(id);
-            _logger.LogInformation($"STO with ID {id} picked successfully.");
+            _logger.LogInformation("Stock Transport Order with ID {StockTransportOrderId} picked successfully.", id);
             var dto = _mapper.Map<StockTransportOrderDto>(stOrder);
             return new OkObjectResult(dto);
         }

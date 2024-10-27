@@ -20,10 +20,12 @@ public class RegionalDistributionCenterController(ILogger<RegionalDistributionCe
             {
                 throw new ArgumentException("Insufficient stock");
             }
-            _logger.LogInformation($"Order --" + stockTransportOrderId.ToString() + "-- is being picked");
-            _logger.LogInformation($"Quantity left: {quantityLeft}");
+            _logger.LogInformation("Order {StockTransportOrderId} is being picked", stockTransportOrderId);
+            _logger.LogInformation("Quantity left: {QuantityLeft}", quantityLeft);
+
             var goodsReceipt = await _goodsReceiptService.Create(new GoodsReceipt { StockTransportOrderId = stockTransportOrderId });
-            _logger.LogInformation($"Stock transport order --{stockTransportOrderId}" + $"-- Has been finished");
+            _logger.LogInformation("Stock transport order {StockTransportOrderId} has been completed", stockTransportOrderId);
+
             var dto = _mapper.Map<GoodsReceipt>(goodsReceipt);
             return new OkObjectResult(dto);
         }
