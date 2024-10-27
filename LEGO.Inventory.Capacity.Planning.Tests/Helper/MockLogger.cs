@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using System;
 
 namespace LEGO.Inventory.Capacity.Planning.Tests.Helper;
 
