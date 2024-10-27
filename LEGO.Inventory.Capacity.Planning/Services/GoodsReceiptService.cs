@@ -30,7 +30,7 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
 
             // Structured log for clear context
             logger.LogInformation(
-                "Updated stock for {LDCName}: Finished Goods Stock = {StockQuantity}, Safety Stock = {SafetyStockQuantity}",localDistributionCenter.Name, localDistributionCenter.FinishedGoodsStockQuantity, localDistributionCenter.SafetyStockQuantity);
+                "Updated stock for {LDCName}: Finished Goods Stock = {StockQuantity}, Safety Stock = {SafetyStockQuantity}", localDistributionCenter.Name, localDistributionCenter.FinishedGoodsStockQuantity, localDistributionCenter.SafetyStockQuantity);
         }
         else
         {
