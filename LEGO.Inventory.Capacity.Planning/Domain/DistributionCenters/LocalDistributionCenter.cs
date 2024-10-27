@@ -24,5 +24,4 @@ public class LocalDistributionCenter
     public int FinishedGoodsStockQuantity { get; set; }
     public int SafetyStockQuantity { get; set; }
     public int SafetyStockThreshold { get; }
-
 }

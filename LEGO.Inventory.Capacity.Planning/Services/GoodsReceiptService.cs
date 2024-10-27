@@ -20,8 +20,7 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
             var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");
             localDistributionCenter.FinishedGoodsStockQuantity += stockTransportOrder.Quantity; // Update Finished Goods Stock
             localDistributionCenter.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold; // Restore Safety Stock
-            logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " +
-                                   localDistributionCenter.SafetyStockQuantity);
+            logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " + localDistributionCenter.SafetyStockQuantity);
         }
         return await _goodsReceiptStorage.AddAsync(goodsReceipt);
     }
