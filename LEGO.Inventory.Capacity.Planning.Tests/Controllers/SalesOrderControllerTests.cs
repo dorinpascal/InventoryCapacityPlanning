@@ -30,7 +30,7 @@ public class SalesOrderControllerTests
         _mockPreparationService = _fixture.Freeze<Mock<ISalesPreparationService>>();
         _mockMapper = _fixture.Freeze<Mock<IMapper>>();
         _mockLogger = _fixture.Freeze<Mock<ILogger<SalesOrderController>>>();
-        _controller = new SalesOrderController( _mockLogger.Object, _mockSalesOrderService.Object, _mockPreparationService.Object, _mockMapper.Object);
+        _controller = new SalesOrderController(_mockLogger.Object, _mockSalesOrderService.Object, _mockPreparationService.Object, _mockMapper.Object);
     }
 
     [Fact]
