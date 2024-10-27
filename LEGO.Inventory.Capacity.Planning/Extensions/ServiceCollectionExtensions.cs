@@ -4,7 +4,7 @@ using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 using LEGO.Inventory.Capacity.Planning.Storage;
 using Microsoft.OpenApi.Models;
 
-namespace LEGO.Inventory.Capacity;
+namespace LEGO.Inventory.Capacity.Planning.Extensions;
 
 public static class ServiceCollectionExtensions
 {

@@ -1,4 +1,4 @@
-using LEGO.Inventory.Capacity;
+using LEGO.Inventory.Capacity.Planning.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
