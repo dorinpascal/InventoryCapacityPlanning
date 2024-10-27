@@ -24,7 +24,6 @@ public class GoodsReceiptServiceTests
         _mockTransportOrderStorage = new Mock<IStockTransportOrderStorage>();
         _mockDistributionCenterStorage = new Mock<ILocalDistributionCenterStorage>();
         _mockLogger = new Mock<ILogger<GoodsReceiptService>>();
-
         _service = new GoodsReceiptService(_mockGoodsReceiptStorage.Object, _mockTransportOrderStorage.Object, _mockDistributionCenterStorage.Object, _mockLogger.Object);
     }
 
