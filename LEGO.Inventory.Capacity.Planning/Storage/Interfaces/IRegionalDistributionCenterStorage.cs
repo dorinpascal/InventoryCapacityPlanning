@@ -5,4 +5,5 @@ namespace LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 public interface IRegionalDistributionCenterStorage
 {
     Task<RegionalDistributionCenter> GetAsync();
+    Task UpdateAsync(RegionalDistributionCenter rdc);
 }

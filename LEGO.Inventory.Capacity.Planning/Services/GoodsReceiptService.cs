@@ -15,14 +15,13 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
     public async Task Create(GoodsReceipt goodsReceipt)
     {
         await _goodsReceiptStorage.AddAsync(goodsReceipt);
-        var stockTransportOrders = await _transportOrderStorage.GetAllAsync();
-        var stockTransportOrder = stockTransportOrders.Find(sto => sto.Id == goodsReceipt.StockTransportOrderId) ??
-            throw new ArgumentException("Missing stock transport order");
+        var stockTransportOrder = await _transportOrderStorage.GetByIdAsync(goodsReceipt.StockTransportOrderId) ?? throw new ArgumentException("Missing stock transport order");            
 
         if (stockTransportOrder.Status == StockTransportOrderStatus.Picked)
         {
-            var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName);
-            localDistributionCenter!.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold;
+            var localDistributionCenter = await _distributionCenterStorage.GetByNameAsync(stockTransportOrder.LocalDistributionCenterName) ?? throw new ArgumentException("Invalid local distribution center name");
+            localDistributionCenter.FinishedGoodsStockQuantity += stockTransportOrder.Quantity; // Update Finished Goods Stock
+            localDistributionCenter.SafetyStockQuantity = localDistributionCenter.SafetyStockThreshold; // Restore Safety Stock
             logger.LogInformation(localDistributionCenter.Name + "'s safety stock has been updated to " +
                                    localDistributionCenter.SafetyStockQuantity);
         }

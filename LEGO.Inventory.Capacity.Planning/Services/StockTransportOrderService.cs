@@ -46,6 +46,9 @@ public class StockTransportOrderService(IStockTransportOrderStorage _stockTransp
         // Reduce the stock quantity in the RDC
         rdc.UpdateQuantity(rdc.FinishedGoodsStockQuantity - sto.Quantity);
 
+        // Persist RDC stock update
+        await _regionalDistributionCenterStorage.UpdateAsync(rdc);
+
         // Persist the changes in the storage
         await _stockTransportOrderStorage.UpdateAsync(sto);
     }

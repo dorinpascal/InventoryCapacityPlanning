@@ -17,6 +17,5 @@ public class SalesOrderService(ISalesOrderStorage _salesOrderStorage, ILocalDist
 
         await _salesOrderStorage.AddAsync(salesOrder);
         _logger.LogInformation($"new order created: " + salesOrder.FinishedGoodsName + " : " + salesOrder.Quantity + " -LDC: " + salesOrder.LocalDistributionCenterName);
-        
     }
 }
