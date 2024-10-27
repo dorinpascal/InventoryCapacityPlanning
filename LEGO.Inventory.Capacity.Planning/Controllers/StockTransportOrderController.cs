@@ -17,7 +17,7 @@ public class StockTransportOrderController(ILogger<StockTransportOrderController
         {
             var stockTransportOrders = await _stockTransportOrderService.GetByLDC(ldcName, status);
             var dto = _mapper.Map<List<StockTransportOrderDto>>(stockTransportOrders);
-            return Ok(dto);
+            return new OkObjectResult(dto);
         }
         catch (Exception ex)
         {
@@ -32,7 +32,7 @@ public class StockTransportOrderController(ILogger<StockTransportOrderController
         {
             await _stockTransportOrderService.PickStockTransportOrder(id);
             _logger.LogInformation($"STO with ID {id} picked successfully.");
-            return Ok("STO picked successfully.");
+            return new OkObjectResult("STO picked successfully.");
         }
         catch (Exception ex)
         {
