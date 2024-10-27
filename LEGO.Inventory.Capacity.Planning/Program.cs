@@ -1,27 +1,13 @@
-using LEGO.Inventory.Capacity.Planning.Services;
-using LEGO.Inventory.Capacity.Planning.Services.Interfaces;
-using LEGO.Inventory.Capacity.Planning.Storage;
-using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
+using LEGO.Inventory.Capacity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IGoodsReceiptService, GoodsReceiptService>();
-builder.Services.AddTransient<ISalesOrderService, SalesOrderService>();
-builder.Services.AddTransient<IStockTransportOrderService, StockTransportOrderService>();
-builder.Services.AddTransient<ISalesPreparationService, PreparationService>();
-builder.Services.AddTransient<IRegionalDistributionCenterService, RegionalDistributionCenterService>();
-builder.Services.AddScoped<IRegionalDistributionCenterStorage, RegionalDistributionCenterStorage>();
-builder.Services.AddScoped<ILocalDistributionCenterStorage, LocalDistributionCenterStorage>();
-builder.Services.AddScoped<ISalesOrderStorage, SalesOrderStorage>();
-builder.Services.AddScoped<IStockTransportOrderStorage, StockTransportOrderStorage>();
-builder.Services.AddScoped<IGoodsReceiptStorage, GoodsReceiptStorage>();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSwaggerDocumentation();
+builder.Services.AddApplicationServices();
+builder.Services.AddStorageServices();
+builder.Services.AddAutoMapperProfiles();
 
 builder.WebHost.UseUrls("http://*:5100");
 
