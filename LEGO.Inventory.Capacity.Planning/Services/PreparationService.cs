@@ -27,28 +27,31 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
     private async Task<int> HandleStockReductionAsync(LocalDistributionCenter localDistributionCenter, int orderedQuantity)
     {
         var requiredQuantity = 0;
-        // Case 1: LDC has enough finished goods to fulfill the order
+        // Case 1: Attempt to fulfill the order from Finished Goods Stock
         if (localDistributionCenter.FinishedGoodsStockQuantity >= orderedQuantity)
         {
             localDistributionCenter.FinishedGoodsStockQuantity -= orderedQuantity;
             await _localDistributionCenterStorage.UpdateAsync(localDistributionCenter);
-            return requiredQuantity; // No additional stock required from STO
+            return requiredQuantity; // Order fully satisfied, no additional stock required
         }
 
-        // Case 2: LDC does not have enough finished goods, calculate the required quantity
+        //  Calculate the remaining quantity required after using all Finished Goods Stock
         requiredQuantity = orderedQuantity - localDistributionCenter.FinishedGoodsStockQuantity;
         localDistributionCenter.FinishedGoodsStockQuantity = 0;
 
-        // Try to cover the remaining quantity using Safety Stock
+        // Case 2: Use Safety Stock if available
         if (localDistributionCenter.SafetyStockQuantity >= requiredQuantity)
         {
             localDistributionCenter.SafetyStockQuantity -= requiredQuantity;
+            requiredQuantity = 0; // Entire order is satisfied
         }
         else
         {
+            // Case 3: Use all Safety Stock, order still partially unsatisfied, trigger for sto
             requiredQuantity -= localDistributionCenter.SafetyStockQuantity;
             localDistributionCenter.SafetyStockQuantity = 0;
         }
+
         await _localDistributionCenterStorage.UpdateAsync(localDistributionCenter);
         return requiredQuantity;
     }
