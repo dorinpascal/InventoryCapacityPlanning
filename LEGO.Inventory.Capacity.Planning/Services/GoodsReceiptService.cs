@@ -26,9 +26,8 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
                 ?? throw new ArgumentException($"Local distribution center '{stockTransportOrder.LocalDistributionCenterName}' not found");
 
             // Update the stock quantities based on the received quantity and safety stock requirements
-            AdjustStockQuantities(localDistributionCenter, stockTransportOrder.Quantity);
-            await _distributionCenterStorage.UpdateAsync(localDistributionCenter);
-
+            await AdjustStockQuantities(localDistributionCenter);
+            
             // Structured log for clear context
             logger.LogInformation(
                 "Updated stock for {LDCName}: Finished Goods Stock = {StockQuantity}, Safety Stock = {SafetyStockQuantity}",
@@ -48,20 +47,17 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
         return createdGoodsReceipt;
     }
 
-    private static void AdjustStockQuantities(LocalDistributionCenter ldc, int receivedQuantity)
+    private async Task AdjustStockQuantities(LocalDistributionCenter ldc)
     {
-        // Calculate the shortfall to reach the safety stock threshold
-        var safetyStockDeficit = ldc.SafetyStockThreshold - ldc.SafetyStockQuantity;
+        // Calculate the difference between SafetyStockThreshold and current SafetyStockQuantity
+        int safetyStockDifference = Math.Max(0, ldc.SafetyStockThreshold - ldc.SafetyStockQuantity);
 
-        // Apply stock to meet the Safety Stock threshold, if there's a deficit
-        if (safetyStockDeficit > 0)
-        {
-            var appliedToSafetyStock = Math.Min(safetyStockDeficit, receivedQuantity);
-            ldc.SafetyStockQuantity += appliedToSafetyStock;
-            receivedQuantity -= appliedToSafetyStock;
-        }
+        // Increase SafetyStockQuantity to match SafetyStockThreshold
+        ldc.SafetyStockQuantity = ldc.SafetyStockThreshold;
 
-        // Any remaining received quantity goes to Finished Goods Stock
-        ldc.FinishedGoodsStockQuantity += receivedQuantity;
+        // Allocate only the difference to Finished Goods Stock
+        ldc.FinishedGoodsStockQuantity += safetyStockDifference;
+
+        await _distributionCenterStorage.UpdateAsync(ldc);
     }
 }

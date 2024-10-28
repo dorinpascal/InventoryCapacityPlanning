@@ -6,7 +6,7 @@ using LEGO.Inventory.Capacity.Planning.Storage.Interfaces;
 
 namespace LEGO.Inventory.Capacity.Planning.Services;
 
-public class StockTransportOrderService(IStockTransportOrderStorage _stockTransportOrderStorage, IRegionalDistributionCenterStorage _regionalDistributionCenterStorage) : IStockTransportOrderService
+public class StockTransportOrderService(IStockTransportOrderStorage _stockTransportOrderStorage) : IStockTransportOrderService
 {
     public async Task<List<StockTransportOrder>> GetByLDC(string localDistributionCenterName, string? status = null)
     {
@@ -24,33 +24,5 @@ public class StockTransportOrderService(IStockTransportOrderStorage _stockTransp
     public async Task<StockTransportOrder> Create(StockTransportOrder stockTransportOrder)
     {
         return await _stockTransportOrderStorage.AddAsync(stockTransportOrder);
-    }
-
-    public async Task<StockTransportOrder> PickStockTransportOrder(Guid id)
-    {
-        var sto = await _stockTransportOrderStorage.GetByIdAsync(id) ?? throw new ArgumentException($"Stock transport order with ID {id} not found.");
-
-        // Ensure the STO is open before picking
-        if (sto.Status is not StockTransportOrderStatus.Open)
-        {
-            throw new InvalidOperationException("Stock transport order must be open to be picked.");
-        }
-        var rdc = await _regionalDistributionCenterStorage.GetAsync();
-        if (sto.Quantity > rdc.FinishedGoodsStockQuantity)
-        {
-            throw new InvalidOperationException("Insufficient stock at the RDC to fulfill the stock transport order.");
-        }
-        // Update the status of the STO to picked
-        sto.UpdateStatus(StockTransportOrderStatus.Picked);
-
-        // Reduce the stock quantity in the RDC
-        rdc.UpdateQuantity(rdc.FinishedGoodsStockQuantity - sto.Quantity);
-
-        // Persist RDC stock update
-        await _regionalDistributionCenterStorage.UpdateAsync(rdc);
-
-        // Persist the changes in the storage
-        var stockTransportOrder = await _stockTransportOrderStorage.UpdateAsync(sto);
-        return stockTransportOrder;
     }
 }

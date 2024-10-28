@@ -19,14 +19,4 @@ public interface IStockTransportOrderService
     /// <returns>A <see cref="Task{StockTransportOrder}"/> representing the asynchronous operation, with the created <see cref="StockTransportOrder"/> object as the result.</returns>
     Task<StockTransportOrder> Create(StockTransportOrder stockTransportOrder);
 
-    /// <summary>
-    /// Picks a stock transport order by its unique identifier, updating its status to indicate it has been picked,
-    /// and returns the updated order.
-    /// </summary>
-    /// <param name="id">The unique identifier of the stock transport order to pick.</param>
-    /// <returns>A <see cref="Task{StockTransportOrder}"/> representing the asynchronous operation, with the updated <see cref="StockTransportOrder"/> object as the result.</returns>
-    /// <exception cref="ArgumentException">Thrown when the stock transport order with the specified ID is not found.</exception>
-    /// <exception cref="InvalidOperationException">Thrown if the stock transport order cannot be picked due to insufficient stock or incorrect status.</exception>
-    Task<StockTransportOrder> PickStockTransportOrder(Guid id);
-
 }

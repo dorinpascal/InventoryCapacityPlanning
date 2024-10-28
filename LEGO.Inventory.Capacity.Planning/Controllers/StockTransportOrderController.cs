@@ -24,21 +24,4 @@ public class StockTransportOrderController(ILogger<StockTransportOrderController
             return ControllerResponseMessageHelper.HandleException(ex, _logger);
         }
     }
-
-    [HttpPost("pick")]
-    public async Task<IActionResult> PickStockTransportOrder([FromQuery] Guid id)
-    {
-        try
-        {
-            var stOrder = await _stockTransportOrderService.PickStockTransportOrder(id);
-            _logger.LogInformation("Stock Transport Order with ID {StockTransportOrderId} picked successfully.", id);
-            var dto = _mapper.Map<StockTransportOrderDto>(stOrder);
-            return new OkObjectResult(dto);
-        }
-        catch (Exception ex)
-        {
-            return ControllerResponseMessageHelper.HandleException(ex, _logger);
-
-        }
-    }
 }

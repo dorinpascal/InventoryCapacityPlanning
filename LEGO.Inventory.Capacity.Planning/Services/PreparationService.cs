@@ -27,27 +27,26 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
     private async Task<int> HandleStockReductionAsync(LocalDistributionCenter localDistributionCenter, int orderedQuantity)
     {
         var requiredQuantity = 0;
-        // Case 1: Attempt to fulfill the order from Finished Goods Stock
+        // Case 1: LDC has enough finished goods to fulfill the order
         if (localDistributionCenter.FinishedGoodsStockQuantity >= orderedQuantity)
         {
             localDistributionCenter.FinishedGoodsStockQuantity -= orderedQuantity;
             await _localDistributionCenterStorage.UpdateAsync(localDistributionCenter);
-            return requiredQuantity; // Order fully satisfied, no additional stock required
+            return requiredQuantity; // No additional stock required from STO
         }
 
-        //  Calculate the remaining quantity required after using all Finished Goods Stock
+        // Case 2: LDC does not have enough finished goods, calculate the required quantity
         requiredQuantity = orderedQuantity - localDistributionCenter.FinishedGoodsStockQuantity;
         localDistributionCenter.FinishedGoodsStockQuantity = 0;
 
-        // Case 2: Use Safety Stock if available
+        // Try to cover the remaining quantity using Safety Stock
         if (localDistributionCenter.SafetyStockQuantity >= requiredQuantity)
         {
             localDistributionCenter.SafetyStockQuantity -= requiredQuantity;
-            requiredQuantity = 0; // Entire order is satisfied
+            requiredQuantity = localDistributionCenter.SafetyStockQuantity < localDistributionCenter.SafetyStockThreshold ? localDistributionCenter.SafetyStockThreshold - localDistributionCenter.SafetyStockQuantity : 0;
         }
         else
         {
-            // Case 3: Use all Safety Stock, order still partially unsatisfied, trigger for sto
             requiredQuantity -= localDistributionCenter.SafetyStockQuantity;
             localDistributionCenter.SafetyStockQuantity = 0;
         }
@@ -55,6 +54,7 @@ public class PreparationService(IStockTransportOrderService _stockTransportOrder
         await _localDistributionCenterStorage.UpdateAsync(localDistributionCenter);
         return requiredQuantity;
     }
+
 
     private async Task CreateStoAsync(SalesOrder salesOrder, LocalDistributionCenter localDistributionCenter, int requiredQuantity)
     {

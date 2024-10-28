@@ -9,30 +9,36 @@ public class RegionalDistributionCenterService(IRegionalDistributionCenterStorag
     public async Task<int> TryPickSTOAsync(Guid stockTransportOrderId)
     {
         // Retrieve the STO from storage
-        var stockTransportOrder = (await _stockTransportOrderStorage.GetAllAsync())
-            .Find(sto => sto.Id == stockTransportOrderId)
-            ?? throw new ArgumentException($"Stock transport order with ID {stockTransportOrderId} not found");
+        var sto = await _stockTransportOrderStorage.GetByIdAsync(stockTransportOrderId) ?? throw new ArgumentException($"Stock transport order with ID {stockTransportOrderId} not found.");
 
+        if (sto.Status is not StockTransportOrderStatus.Open)
+        {
+            throw new InvalidOperationException("Stock transport order must be open to be picked.");
+        }
         // Retrieve the regional distribution center
-        var regionalDistributionCenter = await _regionalDistributionCenterStorage.GetAsync();
+        var rdc = await _regionalDistributionCenterStorage.GetAsync();
 
         // Check if there's enough stock to pick the STO
-        if (stockTransportOrder.Quantity > regionalDistributionCenter.FinishedGoodsStockQuantity)
+        if (sto.Quantity > rdc.FinishedGoodsStockQuantity)
         {
             throw new InvalidOperationException(
-                $"Insufficient stock for STO {stockTransportOrderId}. Ordered: {stockTransportOrder.Quantity}, Available: {regionalDistributionCenter.FinishedGoodsStockQuantity}");
+                $"Insufficient stock for STO {stockTransportOrderId}. Ordered: {sto.Quantity}, Available: {rdc.FinishedGoodsStockQuantity}");
         }
 
         // Update the STO status to Picked
-        stockTransportOrder.UpdateStatus(StockTransportOrderStatus.Picked);
-        await _stockTransportOrderStorage.AddAsync(stockTransportOrder);
+        sto.UpdateStatus(StockTransportOrderStatus.Picked);
+        await _stockTransportOrderStorage.UpdateAsync(sto);
 
         // Update the regional distribution center's stock quantity
-        regionalDistributionCenter.UpdateQuantity(regionalDistributionCenter.FinishedGoodsStockQuantity - stockTransportOrder.Quantity);
+        rdc.UpdateQuantity(rdc.FinishedGoodsStockQuantity - sto.Quantity);
+
+        // Persist RDC stock update
+        await _regionalDistributionCenterStorage.UpdateAsync(rdc);
 
         _logger.LogInformation(
-            "STO {STOId} picked successfully. Quantity picked: {QuantityPicked}. Remaining stock at RDC {RDCName}: {RemainingStock}", stockTransportOrder.Id, stockTransportOrder.Quantity, regionalDistributionCenter.Name, regionalDistributionCenter.FinishedGoodsStockQuantity);
-        return stockTransportOrder.Quantity;
+            "STO {STOId} picked successfully. Quantity picked: {QuantityPicked}. Remaining stock at RDC {RDCName}: {RemainingStock}", sto.Id, sto.Quantity, rdc.Name, rdc.FinishedGoodsStockQuantity);
+
+        return sto.Quantity;
     }
 
 }

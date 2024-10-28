@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace LEGO.Inventory.Capacity.Planning.Controllers;
 
 [ApiController]
-[Route("stock-transport-order")]
+[Route("stock-transport-orders")]
 public class RegionalDistributionCenterController(ILogger<RegionalDistributionCenterController> _logger, IRegionalDistributionCenterService _regionalDistributionCenterService, IGoodsReceiptService _goodsReceiptService, IMapper _mapper) : Controller
 {
-    [HttpPost()]
+    [HttpPost("pick")]
     public async Task<IActionResult> HandleStockTransportOrder([FromQuery] Guid stockTransportOrderId)
     {
         try
