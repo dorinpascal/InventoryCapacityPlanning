@@ -27,7 +27,7 @@ public class GoodsReceiptService(IGoodsReceiptStorage _goodsReceiptStorage, ISto
 
             // Update the stock quantities based on the received quantity and safety stock requirements
             await AdjustStockQuantities(localDistributionCenter);
-            
+
             // Structured log for clear context
             logger.LogInformation(
                 "Updated stock for {LDCName}: Finished Goods Stock = {StockQuantity}, Safety Stock = {SafetyStockQuantity}",
