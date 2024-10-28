@@ -71,49 +71,4 @@ public class StockTransportOrderControllerTests
         Assert.Equal("Service Unavailable", responseMessage.Message);
         Assert.Contains(exceptionMessage, responseMessage.Errors!);
     }
-
-    [Fact]
-    public async Task PickStockTransportOrder_WithValidId_ShouldReturnOkObjectResult()
-    {
-        // Arrange
-        var id = _fixture.Create<Guid>();
-        var sto = _fixture.Create<StockTransportOrder>();
-        var stoDto = _fixture.Create<StockTransportOrderDto>();
-
-        _mockStockTransportOrderService.Setup(s => s.PickStockTransportOrder(id)).ReturnsAsync(sto);
-        _mockMapper.Setup(m => m.Map<StockTransportOrderDto>(sto)).Returns(stoDto);
-
-        // Act
-        var result = await _controller.PickStockTransportOrder(id);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedDto = Assert.IsType<StockTransportOrderDto>(okResult.Value);
-
-        Assert.Equal(stoDto, returnedDto);
-        _mockStockTransportOrderService.Verify(s => s.PickStockTransportOrder(id), Times.Once);
-        _mockMapper.Verify(m => m.Map<StockTransportOrderDto>(sto), Times.Once);
-    }
-
-
-    [Fact]
-    public async Task PickStockTransportOrder_WhenServiceThrowsException_ShouldReturnServiceUnavailable()
-    {
-        // Arrange
-        var id = _fixture.Create<Guid>();
-        var exceptionMessage = "STO not found";
-
-        _mockStockTransportOrderService.Setup(s => s.PickStockTransportOrder(id))
-            .ThrowsAsync(new Exception(exceptionMessage));
-
-        // Act
-        var result = await _controller.PickStockTransportOrder(id);
-
-        // Assert
-        var serviceUnavailableResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(503, serviceUnavailableResult.StatusCode);
-        var responseMessage = Assert.IsType<ErrorResponseBody>(serviceUnavailableResult.Value);
-        Assert.Equal("Service Unavailable", responseMessage.Message);
-        Assert.Contains(exceptionMessage, responseMessage.Errors!);
-    }
 }

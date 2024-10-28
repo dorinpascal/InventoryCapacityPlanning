@@ -17,7 +17,7 @@ public class StockTransportOrderServiceTests
     {
         _mockStoStorage = new Mock<IStockTransportOrderStorage>();
         _mockRdcStorage = new Mock<IRegionalDistributionCenterStorage>();
-        _service = new StockTransportOrderService(_mockStoStorage.Object, _mockRdcStorage.Object);
+        _service = new StockTransportOrderService(_mockStoStorage.Object);
     }
 
     [Fact]
@@ -55,55 +55,5 @@ public class StockTransportOrderServiceTests
 
         // Assert
         _mockStoStorage.Verify(s => s.AddAsync(sto), Times.Once);
-    }
-
-    [Fact]
-    public async Task PickStockTransportOrder_WithSufficientStock_ShouldUpdateStatusAndReduceRDCStock()
-    {
-        // Arrange
-        var sto = new StockTransportOrder("Lego - Harry Potter", 5, "LEGO European Distribution Center", "Central Warehouse Europe");
-        sto.UpdateStatus(StockTransportOrderStatus.Open);
-        var rdc = new RegionalDistributionCenter("LEGO European Distribution Center", "Lego - Harry Potter", 10);
-
-        _mockStoStorage.Setup(s => s.GetByIdAsync(sto.Id)).ReturnsAsync(sto);
-        _mockRdcStorage.Setup(s => s.GetAsync()).ReturnsAsync(rdc);
-
-        // Act
-        await _service.PickStockTransportOrder(sto.Id);
-
-        // Assert
-        Assert.Equal(StockTransportOrderStatus.Picked, sto.Status);
-        Assert.Equal(5, rdc.FinishedGoodsStockQuantity);
-        _mockStoStorage.Verify(s => s.UpdateAsync(sto), Times.Once);
-        _mockRdcStorage.Verify(s => s.UpdateAsync(rdc), Times.Once);
-    }
-
-    [Fact]
-    public async Task PickStockTransportOrder_WithInsufficientStock_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var sto = new StockTransportOrder("Lego - Harry Potter", 15, "LEGO European Distribution Center", "Central Warehouse Europe");
-        sto.UpdateStatus(StockTransportOrderStatus.Open);
-        var rdc = new RegionalDistributionCenter("LEGO European Distribution Center", "Lego - Harry Potter", 10);
-
-        _mockStoStorage.Setup(s => s.GetByIdAsync(sto.Id)).ReturnsAsync(sto);
-        _mockRdcStorage.Setup(s => s.GetAsync()).ReturnsAsync(rdc);
-
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.PickStockTransportOrder(sto.Id));
-        Assert.Equal("Insufficient stock at the RDC to fulfill the stock transport order.", ex.Message);
-    }
-
-    [Fact]
-    public async Task PickStockTransportOrder_WithInvalidStatus_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var sto = new StockTransportOrder("Lego - Harry Potter", 5, "LEGO European Distribution Center", "Central Warehouse Europe");
-        sto.UpdateStatus(StockTransportOrderStatus.Picked);
-        _mockStoStorage.Setup(s => s.GetByIdAsync(sto.Id)).ReturnsAsync(sto);
-
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.PickStockTransportOrder(sto.Id));
-        Assert.Equal("Stock transport order must be open to be picked.", ex.Message);
     }
 }

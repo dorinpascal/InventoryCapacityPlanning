@@ -57,7 +57,11 @@ public class GoodsReceiptServiceTests
         var stockTransportOrder = new StockTransportOrder("Lego - Harry Potter", 10, "LEGO European Distribution Center", "Central Warehouse Europe");
         stockTransportOrder.UpdateStatus(StockTransportOrderStatus.Picked);
 
-        var localDistributionCenter = new LocalDistributionCenter("Central Warehouse Europe", "LEGO European Distribution Center", "Lego - Harry Potter", 20, 5, 5);
+        // Initial setup for Local Distribution Center with a Safety Stock deficit
+        var initialFinishedGoodsStock = 20;
+        var initialSafetyStock = 5;
+        var safetyStockThreshold = 10;
+        var localDistributionCenter = new LocalDistributionCenter("Central Warehouse Europe", "LEGO European Distribution Center", "Lego - Harry Potter", initialFinishedGoodsStock, initialSafetyStock, safetyStockThreshold);
 
         _mockGoodsReceiptStorage.Setup(s => s.AddAsync(goodsReceipt)).ReturnsAsync(goodsReceipt);
         _mockTransportOrderStorage.Setup(s => s.GetByIdAsync(goodsReceipt.StockTransportOrderId)).ReturnsAsync(stockTransportOrder);
@@ -66,9 +70,13 @@ public class GoodsReceiptServiceTests
         // Act
         await _service.Create(goodsReceipt);
 
+        // Calculate expected results
+        var expectedSafetyStock = safetyStockThreshold;
+        var expectedFinishedGoodsStock = initialFinishedGoodsStock + (safetyStockThreshold - initialSafetyStock);
+
         // Assert
-        Assert.Equal(30, localDistributionCenter.FinishedGoodsStockQuantity);
-        Assert.Equal(localDistributionCenter.SafetyStockThreshold, localDistributionCenter.SafetyStockQuantity); // Safety stock reset
+        Assert.Equal(expectedFinishedGoodsStock, localDistributionCenter.FinishedGoodsStockQuantity);
+        Assert.Equal(expectedSafetyStock, localDistributionCenter.SafetyStockQuantity);
         _mockGoodsReceiptStorage.Verify(s => s.AddAsync(goodsReceipt), Times.Once);
 
         // Verify structured log message
@@ -76,6 +84,7 @@ public class GoodsReceiptServiceTests
             $"Updated stock for {localDistributionCenter.Name}: Finished Goods Stock = {localDistributionCenter.FinishedGoodsStockQuantity}, Safety Stock = {localDistributionCenter.SafetyStockQuantity}",
             Times.Once());
     }
+
 
     [Fact]
     public async Task Create_WithMissingStockTransportOrder_ShouldThrowArgumentException()
